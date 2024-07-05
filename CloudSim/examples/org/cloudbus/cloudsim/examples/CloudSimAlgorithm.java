@@ -90,6 +90,8 @@ public class CloudSimAlgorithm {
 			int brokerId = broker.getId();
 
 			//Fourth step: Create one virtual machine
+			
+			// Will hold all vms
 			vmlist = new ArrayList<Vm>();
 
 			//VM description
@@ -101,23 +103,22 @@ public class CloudSimAlgorithm {
 			int pesNumber = 1; //number of cpus
 			String vmm = "Xen"; //VMM name
 
-			//create two VMs
-			Vm vm1 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+			// Use to define how many VMs will be used 
+			int numberOfVms = 4;
+			
 
-			vmid++;
-			Vm vm2 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-			vmid++;
-			Vm vm3 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-
-			vmid++;
-			Vm vm4 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-
-			vmid++;
-			//add the VMs to the vmList
-			vmlist.add(vm1);
-			vmlist.add(vm2);
-			vmlist.add(vm3);
-			vmlist.add(vm4);
+			
+			for (int i= 0; i < numberOfVms; i++) {
+				
+				Vm vm = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+				vmid++;
+				
+				// Add each VM to the VMlist
+				vmlist.add(vm);
+				
+			}
+			
+	
 
 			//submit vm list to the broker
 			broker.submitVmList(vmlist);
@@ -133,40 +134,65 @@ public class CloudSimAlgorithm {
 			long outputSize = 300;
 			UtilizationModel utilizationModel = new UtilizationModelFull();
 
-			Cloudlet cloudlet1 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-			cloudlet1.setUserId(brokerId);
-
-			id++;
-			Cloudlet cloudlet2 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-			cloudlet2.setUserId(brokerId);
 			
-			id++;
-			Cloudlet cloudlet3 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-			cloudlet3.setUserId(brokerId);
+			// Generates VMs
+			for (int i= 0; i < numberOfVms; i++) {
+				
+				Vm vm = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+				vmid++;
+				
+				// Add each VM to the VMlist
+				vmlist.add(vm);
+				
+			}
 			
-			id++;
-			Cloudlet cloudlet4 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-			cloudlet4.setUserId(brokerId);
-			id++;
-	
+			int numberOfCloudlets = 4;
+			// Generates cloudlets
+			for (int i= 0; i < numberOfCloudlets; i++) {
+				
+				Cloudlet cloudlet = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+				cloudlet.setUserId(brokerId);
+				id++;
 
-			//add the cloudlets to the list
-			cloudletList.add(cloudlet1);
-			cloudletList.add(cloudlet2);
-			cloudletList.add(cloudlet3);
-			cloudletList.add(cloudlet4);
+				
+				// Add each cloudlet to cloudletList
+				cloudletList.add(cloudlet);
+				
+			}
+			
+//			Cloudlet cloudlet1 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+//			cloudlet1.setUserId(brokerId);
+//
+//			id++;
+//			Cloudlet cloudlet2 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+//			cloudlet2.setUserId(brokerId);
+//			
+//			id++;
+//			Cloudlet cloudlet3 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+//			cloudlet3.setUserId(brokerId);
+//			
+//			id++;
+//			Cloudlet cloudlet4 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+//			cloudlet4.setUserId(brokerId);
+//			id++;
+//	
+//
+//			//add the cloudlets to the list
+//			cloudletList.add(cloudlet1);
+//			cloudletList.add(cloudlet2);
+//			cloudletList.add(cloudlet3);
+//			cloudletList.add(cloudlet4);
 	
 		
 			//submit cloudlet list to the broker
 			broker.submitCloudletList(cloudletList);
 
 
-			//bind the cloudlets to the vms. This way, the broker
-			// will submit the bound cloudlets only to the specific VM
-			broker.bindCloudletToVm(cloudlet1.getCloudletId(),vm1.getId());
-			broker.bindCloudletToVm(cloudlet2.getCloudletId(),vm2.getId());
-			broker.bindCloudletToVm(cloudlet3.getCloudletId(),vm3.getId());
-			broker.bindCloudletToVm(cloudlet4.getCloudletId(),vm4.getId());
+			
+			// Bind cloudlets to a VM
+			for (int i= 0; i < numberOfCloudlets; i++) {
+				broker.bindCloudletToVm(cloudletList.get(i).getCloudletId(),vmlist.get(i).getId());
+			}
 
 			// Sixth step: Starts the simulation
 			CloudSim.startSimulation();
