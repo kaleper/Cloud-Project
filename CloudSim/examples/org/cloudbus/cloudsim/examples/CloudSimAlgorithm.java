@@ -40,7 +40,7 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
  * two datacenters with one host each and
  * run two cloudlets on them.
  */
-public class CloudSimExample4 {
+public class CloudSimAlgorithm {
 
 	/** The cloudlet list. */
 	private static List<Cloudlet> cloudletList;
@@ -53,7 +53,7 @@ public class CloudSimExample4 {
 	 */
 	public static void main(String[] args) {
 
-		Log.printLine("Starting CloudSimExample4...");
+		Log.printLine("Starting CloudSimAlgorithm...");
 
 		try {
 			// First step: Initialize the CloudSim package. It should be called
@@ -65,12 +65,25 @@ public class CloudSimExample4 {
 			// Initialize the GridSim library
 			CloudSim.init(num_user, calendar, trace_flag);
 
-			// Second step: Create Datacenters
-			//Datacenters are the resource providers in CloudSim. We need at list one of them to run a CloudSim simulation
-			@SuppressWarnings("unused")
-			Datacenter datacenter0 = createDatacenter("Datacenter_0");
-			@SuppressWarnings("unused")
-			Datacenter datacenter1 = createDatacenter("Datacenter_1");
+			// Second step: Create Datacenters.
+			
+			// I'll define how many data centers are created iteratively
+			int numberOfDataCenters = 5;
+			
+			List <Datacenter> datacenters = new ArrayList<>();
+			
+			// Loop to create however many datacenters
+			for (int i = 0; i < numberOfDataCenters; i++) {
+				Datacenter datacenter = createDatacenter("Datacenter-" + i);
+			
+				datacenters.add(datacenter);
+			}
+		
+//			@SuppressWarnings("unused")
+//			Datacenter datacenter0 = createDatacenter("Datacenter_0");
+//			@SuppressWarnings("unused")
+//			Datacenter datacenter1 = createDatacenter("Datacenter_1");
+		
 
 			//Third step: Create Broker
 			DatacenterBroker broker = createBroker();
@@ -93,10 +106,18 @@ public class CloudSimExample4 {
 
 			vmid++;
 			Vm vm2 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+			vmid++;
+			Vm vm3 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
+			vmid++;
+			Vm vm4 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+
+			vmid++;
 			//add the VMs to the vmList
 			vmlist.add(vm1);
 			vmlist.add(vm2);
+			vmlist.add(vm3);
+			vmlist.add(vm4);
 
 			//submit vm list to the broker
 			broker.submitVmList(vmlist);
@@ -118,11 +139,24 @@ public class CloudSimExample4 {
 			id++;
 			Cloudlet cloudlet2 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet2.setUserId(brokerId);
+			
+			id++;
+			Cloudlet cloudlet3 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			cloudlet3.setUserId(brokerId);
+			
+			id++;
+			Cloudlet cloudlet4 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			cloudlet4.setUserId(brokerId);
+			id++;
+	
 
 			//add the cloudlets to the list
 			cloudletList.add(cloudlet1);
 			cloudletList.add(cloudlet2);
-
+			cloudletList.add(cloudlet3);
+			cloudletList.add(cloudlet4);
+	
+		
 			//submit cloudlet list to the broker
 			broker.submitCloudletList(cloudletList);
 
@@ -131,6 +165,8 @@ public class CloudSimExample4 {
 			// will submit the bound cloudlets only to the specific VM
 			broker.bindCloudletToVm(cloudlet1.getCloudletId(),vm1.getId());
 			broker.bindCloudletToVm(cloudlet2.getCloudletId(),vm2.getId());
+			broker.bindCloudletToVm(cloudlet3.getCloudletId(),vm3.getId());
+			broker.bindCloudletToVm(cloudlet4.getCloudletId(),vm4.getId());
 
 			// Sixth step: Starts the simulation
 			CloudSim.startSimulation();
@@ -143,7 +179,7 @@ public class CloudSimExample4 {
 
         	printCloudletList(newList);
 
-			Log.printLine("CloudSimExample4 finished!");
+			Log.printLine("CloudSimAlgorithm finished!");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
