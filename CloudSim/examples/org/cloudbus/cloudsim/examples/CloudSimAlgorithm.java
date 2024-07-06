@@ -16,15 +16,18 @@ package org.cloudbus.cloudsim.examples;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
+import org.cloudbus.cloudsim.DatacenterModel;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Pe;
@@ -78,11 +81,36 @@ public class CloudSimAlgorithm {
 			
 			List <Datacenter> datacenters = new ArrayList<>();
 			
-			// Loop to create however many datacenters
-			for (int i = 0; i < numberOfDataCenters; i++) {
-				Datacenter datacenter = createDatacenter("Datacenter-" + i);
+			// First model has Adjusted Datacenter prices to more closely reflect real world pricing. Prices are in dollars
+			// Params: Archetype, OS, VMM, Time_zone(of resource), Cost(GB per month), costPerMem(GB per month), costPerStorage(GB per month), costPerBw
+	
+			DatacenterModel model1 = new DatacenterModel("x86", "Linux", "Xen", 10.0, 0.02, 0.01, 0.002, 0.001);
+			DatacenterModel model2 = new DatacenterModel("x86", "Linux", "Xen", 7.0, 0.03, 0.02, 0.0032, 0.0015);
+			DatacenterModel model3 = new DatacenterModel("x86", "Linux", "Xen", 12.0, 0.015, 0.013, 0.001, 0.0005);
+			DatacenterModel model4 = new DatacenterModel("x86", "Linux", "Xen", 4.0, 0.025, 0.022, 0.0024, 0.0010);
+			DatacenterModel model5 = new DatacenterModel("x86", "Linux", "Xen", 6.0, 0.020, 0.018, 0.0029, 0.0008);
 			
-				datacenters.add(datacenter);
+			// Put all the different models in a list
+			List<DatacenterModel> datacenterModels = Arrays.asList(model1, model2, model3, model4, model5);
+			
+			
+			
+			// Loop to create however many data centers I specify
+			// This randomization currently assumes that more than one data center can share the same types of models. Now when cost is calculated, 
+			// the total costs of all VMs are different everytime.
+			for (int i = 0; i < numberOfDataCenters; i++) {
+				
+			    // Generate a random index based on number of models available
+			    int randomIndex = (int) (Math.random() * datacenterModels.size()) + 1; 
+			    
+			    // Get the model corresponding to the random index
+			    DatacenterModel randomModel = datacenterModels.get(randomIndex - 1); 
+			    
+			    // Create a Datacenter using the random model
+			    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
+			    
+			    // Add the datacenter to the list
+			    datacenters.add(datacenter);
 			}
 		
 //			@SuppressWarnings("unused")
@@ -232,7 +260,7 @@ public class CloudSimAlgorithm {
 		}
 	}
 
-	private static Datacenter createDatacenter(String name){
+	private static Datacenter createDatacenter(String name, DatacenterModel model){
 
 		// Here are the steps needed to create a PowerDatacenter:
 		// 1. We need to create a list to store
@@ -274,23 +302,32 @@ public class CloudSimAlgorithm {
 		//    properties of a data center: architecture, OS, list of
 		//    Machines, allocation policy: time- or space-shared, time zone
 		//    and its price (G$/Pe time unit).
-		String arch = "x86";      // system architecture
-		String os = "Linux";          // operating system
-		String vmm = "Xen";
-		// Adjusted Datacenter prices to more closely reflect real world pricing. Prices are in dollars
-		double time_zone = 10.0;         // time zone this resource located
-		// Processing power per hr
-		double cost = 0.02;        
-		// GB per month
-		double costPerMem = 0.01;		
-		// GB per month
-		double costPerStorage = 0.002;	
 		
-		double costPerBw = 0.001;
+		
+
+		DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
+		        model.getArch(), model.getOs(), model.getVmm(), hostList,
+		        model.getTime_zone(), model.getCost(), model.getCostPerMem(),
+		        model.getCostPerStorage(), model.getCostPerBw());
+		
+		
+		// Previous code pre-data center model class creation
+			//		String arch = "x86";      // system architecture
+			//		String os = "Linux";          // operating system
+			//		String vmm = "Xen";
+			//		// Adjusted Datacenter prices to more closely reflect real world pricing. Prices are in dollars
+			//		double time_zone = 10.0;         // time zone this resource located
+			//		// Processing power per hr
+			//		double cost = 0.02;        
+			//		// GB per month
+			//		double costPerMem = 0.01;		
+			//		// GB per month
+			//		double costPerStorage = 0.002;	
+			//		
+			//		double costPerBw = 0.001;
 		LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
 
-	       DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
-	                arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
+		
 	       
 	       
 	

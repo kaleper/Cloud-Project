@@ -24,7 +24,7 @@ import org.cloudbus.cloudsim.core.CloudSim;
  * @author Anton Beloglazov
  * @since CloudSim Toolkit 1.0
  */
-public  class VmAllocationPolicyImplementation extends VmAllocationPolicy {
+public class VmAllocationPolicyImplementation extends VmAllocationPolicy {
 
 	/** The host list. */
 	private List<? extends Host> hostList;
