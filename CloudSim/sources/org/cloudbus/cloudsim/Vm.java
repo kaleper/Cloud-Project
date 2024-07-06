@@ -24,6 +24,10 @@ public class Vm {
 
 	/** The id. */
 	private int id;
+	
+	/** The id. */
+	private int vmModelId;
+
 
 	/** The user id. */
 	private int userId;
@@ -100,6 +104,7 @@ public class Vm {
 	 */
 	public Vm(
 			int id,
+			int vmModelId,
 			int userId,
 			double mips,
 			int numberOfPes,
@@ -109,6 +114,7 @@ public class Vm {
 			String vmm,
 			CloudletScheduler cloudletScheduler) {
 		setId(id);
+		setVmModelId(vmModelId);
 		setUserId(userId);
 		setUid(getUid(userId, id));
 		setMips(mips);
@@ -278,6 +284,14 @@ public class Vm {
 	 */
 	protected void setId(int id) {
 		this.id = id;
+	}
+	
+	public int getVmModelId() {
+		return vmModelId;
+	}
+
+	public void setVmModelId(int vmModelId) {
+		this.vmModelId = vmModelId;
 	}
 
 	/**

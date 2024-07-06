@@ -34,6 +34,7 @@ import org.cloudbus.cloudsim.Pe;
 import org.cloudbus.cloudsim.Storage;
 import org.cloudbus.cloudsim.UtilizationModel;
 import org.cloudbus.cloudsim.UtilizationModelFull;
+import org.cloudbus.cloudsim.VMModel;
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.VmSchedulerSpaceShared;
@@ -84,15 +85,15 @@ public class CloudSimAlgorithm {
 			// First model has Adjusted Datacenter prices to more closely reflect real world pricing. Prices are in dollars
 			// Params: Archetype, OS, VMM, Time_zone(of resource), Cost(GB per month), costPerMem(GB per month), costPerStorage(GB per month), costPerBw
 	
-			DatacenterModel model1 = new DatacenterModel("x86", "Linux", "Xen", 10.0, 0.02, 0.01, 0.002, 0.001);
-			DatacenterModel model2 = new DatacenterModel("x86", "Linux", "Xen", 7.0, 0.03, 0.02, 0.0032, 0.0015);
-			DatacenterModel model3 = new DatacenterModel("x86", "Linux", "Xen", 12.0, 0.015, 0.013, 0.001, 0.0005);
-			DatacenterModel model4 = new DatacenterModel("x86", "Linux", "Xen", 4.0, 0.025, 0.022, 0.0024, 0.0010);
-			DatacenterModel model5 = new DatacenterModel("x86", "Linux", "Xen", 6.0, 0.020, 0.018, 0.0029, 0.0008);
-			
+			DatacenterModel datacenterModel1 = new DatacenterModel("x86", "Linux", "Xen", 10.0, 0.02, 0.01, 0.002, 0.001);
+			DatacenterModel datacenterModel2 = new DatacenterModel("x86", "Linux", "Xen", 7.0, 0.03, 0.02, 0.0032, 0.0015);
+			DatacenterModel datacenterModel3 = new DatacenterModel("x86", "Linux", "Xen", 12.0, 0.015, 0.013, 0.001, 0.0005);
+			DatacenterModel datacenterModel4 = new DatacenterModel("x86", "Linux", "Xen", 4.0, 0.025, 0.022, 0.0024, 0.0010);
+			DatacenterModel datacenterModel5 = new DatacenterModel("x86", "Linux", "Xen", 6.0, 0.020, 0.018, 0.0029, 0.0008);
+
 			// Put all the different models in a list
-			List<DatacenterModel> datacenterModels = Arrays.asList(model1, model2, model3, model4, model5);
-			
+			List<DatacenterModel> datacenterModels = Arrays.asList(datacenterModel1, datacenterModel2, datacenterModel3, datacenterModel4, datacenterModel5);
+
 			
 			
 			// Loop to create however many data centers I specify
@@ -101,10 +102,10 @@ public class CloudSimAlgorithm {
 			for (int i = 0; i < numberOfDataCenters; i++) {
 				
 			    // Generate a random index based on number of models available
-			    int randomIndex = (int) (Math.random() * datacenterModels.size()) + 1; 
+			    int randomDataCenterModelIndex = (int) (Math.random() * datacenterModels.size()); 
 			    
 			    // Get the model corresponding to the random index
-			    DatacenterModel randomModel = datacenterModels.get(randomIndex - 1); 
+			    DatacenterModel randomModel = datacenterModels.get(randomDataCenterModelIndex); 
 			    
 			    // Create a Datacenter using the random model
 			    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
@@ -125,28 +126,64 @@ public class CloudSimAlgorithm {
 
 			//Fourth step: Create one virtual machine
 			
-			// Will hold all vms
-			List <Vm> vmlist = new ArrayList<Vm>();
 
-			//VM description
-			int vmid = 0;
-			int mips = 250;
-			long size = 10000; //image size (MB)
-			int ram = 512; //vm memory (MB)
-			long bw = 1000;
-			int pesNumber = 1; //number of cpus
-			String vmm = "Xen"; //VMM name
+			
+			// Different models with different specifications. 
+			// These models will be randomized into actual instances of VMs.
+			// Params id, MIPS, image size (MB), memory (MB), Bandwith, # of cpus, VMM name
+			VMModel vmModel1 = new VMModel(0, 250, 10000, 512, 1000, 1, "Xen");
+			VMModel vmModel2 = new VMModel(1, 500, 15000, 1024, 1500, 1, "VirtualBox");
+			VMModel vmModel3 = new VMModel(2, 350, 12000, 768, 1200, 1, "VMPower");
+			VMModel vmModel4 = new VMModel(3, 350, 18000, 2048, 2000, 1, "FastVM");
+			VMModel vmModel5 = new VMModel(4, 350, 13500, 2048, 1600, 1, "Mirror");
+
+			// Put all the different models in a list
+			List<VMModel> vmModels = Arrays.asList(vmModel1, vmModel2, vmModel3, vmModel4, vmModel5);
+			
+			
+//				System.out.println("VM MODEL ID:");
+//				System.out.println(vmModels.get(2).getVmModelId());
+
+			// Will hold all Vm instances with a model associated to it
+			List <Vm> vmlist = new ArrayList<Vm>();
+//			//VM descriptions, pre-class
+//			int vmid = 0;
+//			int mips = 250;
+//			long size = 10000; //image size (MB)
+//			int ram = 512; //vm memory (MB)
+//			long bw = 1000;
+//			int pesNumber = 1; //number of cpus
+//			String vmm = "Xen"; //VMM name
 
 			// Use to define how many VMs will be used 
-			int numberOfVms = 4;
+			int numberOfVms = 5;
 			
 
-			
+			// Assign VMs 
 			for (int i= 0; i < numberOfVms; i++) {
 				
-				Vm vm = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-				vmid++;
+				  // Generate a random index based on number of models available
+			    int randomVmModelIndex = (int) (Math.random() * (vmModels.size()));
+			    
+			    // Get the model corresponding to the random index
+			    VMModel vmModel = vmModels.get(randomVmModelIndex); 
 				
+			    Vm vm = new Vm(i,vmModel.getVmModelId(), brokerId, vmModel.getMips(),
+	                    vmModel.getPesNumber(), vmModel.getRam(),
+	                    vmModel.getBw(), vmModel.getSize(),
+	                    vmModel.getVmm(), new CloudletSchedulerTimeShared());
+			    
+			    System.out.println("VM ID: " + vm.getId());
+			    System.out.println("VM Model ID: " + vm.getVmModelId());
+	            System.out.println("MIPS: " + vm.getMips());
+	            System.out.println("RAM: " + vm.getRam());
+	            System.out.println("Storage Size: " + vm.getSize());
+	            System.out.println("Bandwidth: " + vm.getBw());
+	            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
+	            System.out.println("VMM: " + vm.getVmm());
+	            System.out.println();
+				
+			    
 				// Add each VM to the VMlist
 				vmlist.add(vm);
 				
@@ -168,25 +205,15 @@ public class CloudSimAlgorithm {
 			long outputSize = 300;
 			UtilizationModel utilizationModel = new UtilizationModelFull();
 
+	
 			
-			// Generates VMs
-			for (int i= 0; i < numberOfVms; i++) {
-				
-				Vm vm = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-				vmid++;
-				
-				// Add each VM to the VMlist
-				vmlist.add(vm);
-			
-				
-			}
-		
-			
-			int numberOfCloudlets = 4;
+			int numberOfCloudlets = 5;
+
 			// Generates cloudlets
 			for (int i= 0; i < numberOfCloudlets; i++) {
 				
-				Cloudlet cloudlet = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+				// 1 IS PES NUMBER; I'm assuming all CPUs have 1 core. Change to pesNumber = ; if needed.
+				Cloudlet cloudlet = new Cloudlet(id, length, 1, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 				cloudlet.setUserId(brokerId);
 				id++;
 
