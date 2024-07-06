@@ -7,6 +7,11 @@
  * Copyright (c) 2009, The University of Melbourne, Australia
  */
 
+/* TODO: 1. Currently, all specifications are made to be uniform in specification. Randomization is needed to initial specifications before being fed into loops to initialize; 
+ * 			Randomization criteria to be entered to make characteristics heterogeneous
+ * 
+ */
+
 package org.cloudbus.cloudsim.examples;
 
 import java.text.DecimalFormat;
@@ -30,6 +35,7 @@ import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.VmSchedulerSpaceShared;
 import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.lists.HostList;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
@@ -143,8 +149,10 @@ public class CloudSimAlgorithm {
 				
 				// Add each VM to the VMlist
 				vmlist.add(vm);
+			
 				
 			}
+		
 			
 			int numberOfCloudlets = 4;
 			// Generates cloudlets
@@ -206,6 +214,10 @@ public class CloudSimAlgorithm {
         	printCloudletList(newList);
 
 			Log.printLine("CloudSimAlgorithm finished!");
+			
+			/** TEST CASE **/
+			// COST OF ONE VM
+			System.out.println(getCostOfSingleVM(datacenters.getFirst(), vmlist.getFirst()));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -234,6 +246,8 @@ public class CloudSimAlgorithm {
 		int ram = 2048; //host memory (MB)
 		long storage = 1000000; //host storage
 		int bw = 10000;
+		
+		
 
 
 		//in this example, the VMAllocatonPolicy in use is SpaceShared. It means that only one VM
@@ -256,15 +270,23 @@ public class CloudSimAlgorithm {
 		String arch = "x86";      // system architecture
 		String os = "Linux";          // operating system
 		String vmm = "Xen";
+		// Adjusted Datacenter prices to more closely reflect real world pricing. Prices are in dollars
 		double time_zone = 10.0;         // time zone this resource located
-		double cost = 3.0;              // the cost of using processing in this resource
-		double costPerMem = 0.05;		// the cost of using memory in this resource
-		double costPerStorage = 0.001;	// the cost of using storage in this resource
-		double costPerBw = 0.0;			// the cost of using bw in this resource
+		// Processing power per hr
+		double cost = 0.02;        
+		// GB per month
+		double costPerMem = 0.01;		
+		// GB per month
+		double costPerStorage = 0.002;	
+		
+		double costPerBw = 0.001;
 		LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
 
 	       DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
 	                arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
+	       
+	       
+	
 
 
 		// 6. Finally, we need to create a PowerDatacenter object.
@@ -274,7 +296,7 @@ public class CloudSimAlgorithm {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
 		return datacenter;
 	}
 
@@ -321,4 +343,75 @@ public class CloudSimAlgorithm {
 		}
 
 	}
+	// TODO: Figure out way to make this cost function work. Lists VS just using separate values individually? Can't access VMlist / database.characteristics due to protected status
+	public static double getCostOfSingleVM(Datacenter datacenter, Vm vm) {
+
+		// Datacenter pricing rates
+		
+			// Assume dollars per GB / month
+			double memoryRate = datacenter.getCharacteristics().getCostPerMem();
+			
+			// Assume dollars per GB / month
+			double storageRate = datacenter.getCharacteristics().getCostPerStorage();
+			// Assume dollars per GB
+			double bwRate = datacenter.getCharacteristics().getCostPerBw();
+			// Equal to cost for processing, dollars per second
+			double processingRate = datacenter.getCharacteristics().getCostPerSecond();
+			
+		
+		// VM characteristics
+			//Assume megabytes per second
+			double vmBw = vm.getBw();
+			// MB
+			double vmStorage = vm.getSize();
+			// Dollars per MB
+			double vmMemory = vm.getRam();
+			//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
+			double vmProcessing = vm.getMips();
+			
+			
+			// Convert the MB to GB
+			double vmBwGB = vmBw / 1024; 
+			// MB
+			double vmStorageGB = vmStorage / 1024;
+			// Dollars per MB
+			double vmMemoryGB = vmMemory / 1024;
+			//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
+			double vmProcessingGB = vm.getMips();
+			
+		
+			// Hours in a month to get usage from user
+			int usageHrsPerMonth = 720;
+		
+			// 1000 MIPS per processor, 
+			// https://learn.microsoft.com/en-us/azure/virtual-machines/workloads/mainframe-rehosting/concepts/mainframe-compute-azure
+			double processingCost = processingRate * (vmProcessing/1000) * usageHrsPerMonth;
+			
+	
+			double memoryCost = memoryRate * vmMemory;
+			double storageCost = storageRate * vmStorage;
+			// Usually free from big data centers like Microsoft for some? Rate set very low
+			//https://azure.microsoft.com/en-us/pricing/details/bandwidth/
+			// Most cloud providers charge gb per month
+			double bwCost = bwRate * vmBw;
+			
+			
+			
+			
+			
+			double totalCost = memoryCost + storageCost + processingCost + bwCost;
+			// Test case using current numbers come out to $29.72, closer to real world pricing compared to previous pricing
+			
+			// Format the pricing to 2 decimal values
+			String formattedTotalCost = String.format("%.2f", totalCost);
+		
+			// Convert back to double
+			double parsedTotalCost = Double.parseDouble(formattedTotalCost);
+			
+			return parsedTotalCost;
+			
+		
+		
+	}
+
 }

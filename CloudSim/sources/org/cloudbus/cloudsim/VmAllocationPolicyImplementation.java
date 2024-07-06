@@ -130,6 +130,6 @@ public  class VmAllocationPolicyImplementation extends VmAllocationPolicy {
 	@SuppressWarnings("unchecked")
 	public <T extends Host> List<T> getHostList() {
 		return (List<T>) hostList;
-	}
+	}	
 
 }
