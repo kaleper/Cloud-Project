@@ -52,7 +52,7 @@ public class CloudSimAlgorithm {
 	private static List<Cloudlet> cloudletList;
 
 	/** The vmlist. */
-	private static List<Vm> vmlist;
+//	private static List<Vm> vmlist;
 
 	/**
 	 * Creates main() to run this example
@@ -98,7 +98,7 @@ public class CloudSimAlgorithm {
 			//Fourth step: Create one virtual machine
 			
 			// Will hold all vms
-			vmlist = new ArrayList<Vm>();
+			List <Vm> vmlist = new ArrayList<Vm>();
 
 			//VM description
 			int vmid = 0;
@@ -216,8 +216,15 @@ public class CloudSimAlgorithm {
 			Log.printLine("CloudSimAlgorithm finished!");
 			
 			/** TEST CASE **/
+			// COST OF ALL VMS
+			System.out.println("-----------------------");
+			System.out.println("COST OF ALL VMS:");
+			System.out.println(getTotalCostOfAllVMs(datacenters, vmlist));
+			
+		
 			// COST OF ONE VM
-			System.out.println(getCostOfSingleVM(datacenters.getFirst(), vmlist.getFirst()));
+//			System.out.println(getCostOfSingleVM(datacenters.getFirst(), vmlist.getFirst()));
+			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -395,23 +402,39 @@ public class CloudSimAlgorithm {
 			// Most cloud providers charge gb per month
 			double bwCost = bwRate * vmBw;
 			
-			
-			
-			
-			
 			double totalCost = memoryCost + storageCost + processingCost + bwCost;
 			// Test case using current numbers come out to $29.72, closer to real world pricing compared to previous pricing
 			
-			// Format the pricing to 2 decimal values
-			String formattedTotalCost = String.format("%.2f", totalCost);
 		
-			// Convert back to double
-			double parsedTotalCost = Double.parseDouble(formattedTotalCost);
 			
-			return parsedTotalCost;
+			return totalCost;
 			
+	}
+	
+	// Currently, obtains cost for vms that are allocated sequentially to available hosts or data centers
+	public static double getTotalCostOfAllVMs(List<Datacenter> datacenters, List<Vm> vmlist) {
+	    double totalCost = 0.0;
+
+	    // Iterates through until the vms are all allocated or there are not enough hosts
+	    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
+	    	
+	        Vm vm = vmlist.get(i);
+	        Datacenter datacenter = datacenters.get(i);
+
+	        // Calculate the cost of assigning the current VM to the current datacenter
+	        double vmCost = getCostOfSingleVM(datacenter, vm);
+	        totalCost += vmCost;
+
+	     // Test output
+	        //System.out.println("VM " + vm.getId() + " assigned to Datacenter " + datacenter.getId() + ", Cost: $" + vmCost);
+	    }
+
+
 		
-		
+
+		return totalCost;
+	    
+	    
 	}
 
 }
