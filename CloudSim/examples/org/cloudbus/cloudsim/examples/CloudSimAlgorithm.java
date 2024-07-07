@@ -22,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.cloudbus.cloudsim.Allocation;
+import org.cloudbus.cloudsim.Chromosome;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.Datacenter;
@@ -290,6 +292,15 @@ public class CloudSimAlgorithm {
 			System.out.println("LATENCY COST FOR THE FIRST DATA CENTER");
 			System.out.println(calculateLatencyCost(datacenters.getFirst(), vmlist.getFirst()) + " ms");
 			
+	
+			System.out.println("-----------------------");
+			System.out.println("Creating all allocations:");
+			Chromosome chromosome = new Chromosome();
+			allocateAllVmsRandomly(chromosome, datacenters, vmlist);
+			chromosome.printAllAllocations();
+			
+			
+			
 			
 			//System.out.println(datacenters.get(4).getCharacteristics().getTimeZone());
 		
@@ -532,5 +543,33 @@ public class CloudSimAlgorithm {
 		
 			
 	}
+	
+	// Iterate through all VMS to allocate to hosts randomly
+		public static void allocateAllVmsRandomly(Chromosome chromosome, List<Datacenter> datacenters, List<Vm> vmlist) {
+			
+			// Iterates through until the vms are all allocated or there are not enough hosts
+		    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
+		    	 	Vm vm = vmlist.get(i);
+			        Datacenter datacenter = datacenters.get(i);
+			        
+			        // Calculate the cost of assigning the current VM to the current datacenter
+			        double vmCost = getCostOfSingleVM(datacenter, vm);
+			        
+			        // Calculate the latency of assigning the current VM to the current datacenter
+			        double vmLatency= calculateLatencyCost(datacenter, vm);
+			        
+			        // Save allocation details
+			        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
+			        
+			        chromosome.addAllocation(allocation);
+			        
+		    }
+		    
+		    
+			
+		    
+		  
+				
+		}
 
 }
