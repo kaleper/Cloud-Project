@@ -538,8 +538,8 @@ public class CloudSimAlgorithm {
 		double datacenterTimezone = datacenter.getCharacteristics().getTimeZone();
 		double vmTimezone = vm.getTime_zone();
 		
-		
-		return Math.abs(datacenterTimezone - vmTimezone) * ((int) (Math.random() * 6) + 15);
+		latency +=  Math.abs(datacenterTimezone - vmTimezone) * ((int) (Math.random() * 6) + 15);
+		return latency;
 		
 			
 	}

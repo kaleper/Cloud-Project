@@ -62,7 +62,7 @@ public class Chromosome {
 	        System.out.println("VM Id: " + allocation.getVmId());
 	        System.out.println("Datacenter ID: " + allocation.getDatacenterId());
 	        System.out.println("Cost: $" + String.format("%.2f", allocation.getCost()));
-	        System.out.println("Latency: " + allocation.getLatency() + " ms\n");
+	        System.out.println("Latency: " + String.format("%.2f", allocation.getLatency()) + " ms\n");
 	    }
 	}
     
