@@ -50,6 +50,8 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
  * two datacenters with one host each and
  * run two cloudlets on them.
  */
+
+//TODO: Add Latency parameters
 public class CloudSimAlgorithm {
 
 	/** The cloudlet list. */
@@ -159,7 +161,7 @@ public class CloudSimAlgorithm {
 			int numberOfVms = 5;
 			
 
-			// Assign VMs 
+			// Assign VM models to VM
 			for (int i= 0; i < numberOfVms; i++) {
 				
 				  // Generate a random index based on number of models available
@@ -187,6 +189,15 @@ public class CloudSimAlgorithm {
 				// Add each VM to the VMlist
 				vmlist.add(vm);
 				
+			}
+			
+			// Simulate assigning VMs to a user by assigning them a timezone where a user would be (Replicates different geographical locations)
+			
+			for (int i = 0; i < vmlist.size(); i++) {
+				
+				// Generate a random offset between 1 and 12
+				int randomOffset = (int) (Math.random() * 12) + 1;
+				vmlist.get(i).setTime_zone(randomOffset);
 			}
 			
 	
@@ -274,8 +285,13 @@ public class CloudSimAlgorithm {
 			// COST OF ALL VMS
 			System.out.println("-----------------------");
 			System.out.println("COST OF ALL VMS:");
-			System.out.println(getTotalCostOfAllVMs(datacenters, vmlist));
+			System.out.println("$" + getTotalCostOfAllVMs(datacenters, vmlist) + " /month");
+			System.out.println("-----------------------");
+			System.out.println("LATENCY COST FOR THE FIRST DATA CENTER");
+			System.out.println(calculateLatencyCost(datacenters.getFirst(), vmlist.getFirst()) + " ms");
 			
+			
+			//System.out.println(datacenters.get(4).getCharacteristics().getTimeZone());
 		
 			// COST OF ONE VM
 //			System.out.println(getCostOfSingleVM(datacenters.getFirst(), vmlist.getFirst()));
@@ -337,7 +353,8 @@ public class CloudSimAlgorithm {
 		        model.getTime_zone(), model.getCost(), model.getCostPerMem(),
 		        model.getCostPerStorage(), model.getCostPerBw());
 		
-		
+		System.out.println("CREATING TIME_ZONE:");
+		System.out.println(model.getTime_zone());
 		// Previous code pre-data center model class creation
 			//		String arch = "x86";      // system architecture
 			//		String os = "Linux";          // operating system
@@ -499,6 +516,21 @@ public class CloudSimAlgorithm {
 		return totalCost;
 	    
 	    
+	}
+	
+	// Latency in MS
+	public static double calculateLatencyCost(Datacenter datacenter, Vm vm) {
+		
+		// Starting point for latency (between 1-15ms); even if the host and the vm are in the same time zone, expected to have some delay
+		double latency = 1 + Math.random() * 14;
+		
+		double datacenterTimezone = datacenter.getCharacteristics().getTimeZone();
+		double vmTimezone = vm.getTime_zone();
+		
+		
+		return Math.abs(datacenterTimezone - vmTimezone) * ((int) (Math.random() * 6) + 15);
+		
+			
 	}
 
 }

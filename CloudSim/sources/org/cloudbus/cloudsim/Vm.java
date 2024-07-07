@@ -55,6 +55,10 @@ public class Vm {
 
 	/** The Cloudlet scheduler. */
 	private CloudletScheduler cloudletScheduler;
+	
+	/** REPRESENTS location where user is using VM **/
+	private double time_zone;
+
 
 	/** The host. */
 	private Host host;
@@ -124,7 +128,7 @@ public class Vm {
 		setSize(size);
 		setVmm(vmm);
 		setCloudletScheduler(cloudletScheduler);
-
+	
 		setInMigration(false);
 		setBeingInstantiated(true);
 
@@ -472,6 +476,14 @@ public class Vm {
 	 */
 	protected void setCloudletScheduler(CloudletScheduler cloudletScheduler) {
 		this.cloudletScheduler = cloudletScheduler;
+	}
+	
+	public double getTime_zone() {
+		return time_zone;
+	}
+	
+	public void setTime_zone(double time_zone) {
+		this.time_zone = time_zone;
 	}
 
 	/**

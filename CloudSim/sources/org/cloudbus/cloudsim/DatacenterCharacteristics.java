@@ -119,7 +119,7 @@ public class DatacenterCharacteristics {
 		setAllocationPolicy(allocationPolicy);
 		setCostPerSecond(costPerSec);
 
-		setTimeZone(0.0);
+		setTimeZone(timeZone);
 
 		setVmm(vmm);
 		setCostPerMem(costPerMem);
@@ -509,7 +509,7 @@ public class DatacenterCharacteristics {
 	 * 
 	 * @return the time zone
 	 */
-	protected double getTimeZone() {
+	public double getTimeZone() {
 		return timeZone;
 	}
 
