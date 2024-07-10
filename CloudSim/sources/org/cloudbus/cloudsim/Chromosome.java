@@ -65,6 +65,33 @@ public class Chromosome {
 	        System.out.println("Latency: " + String.format("%.2f", allocation.getLatency()) + " ms\n");
 	    }
 	}
+	
+ // Method to get allocation by index
+    public Allocation getAllocation(int index) {
+        if (index >= 0 && index < allocations.size()) {
+            return allocations.get(index);
+        }
+        // if Invalid index
+        return null; 
+    }
     
+ public double calculateFitness (double minCost, double maxCost, int minLatency, int maxLatency, Allocation allocation) {
+    	
+    	// Can change weightings depending on which one I favour more
+    	// Cost weighted slightly more than latency in my example
+    	double costWeight = 0.6; 
+    	// Latency weighted less
+        double latencyWeight = 0.4; 
+
+        // Reversed normalization to get a cost or latency between 0-1, with closer to 1 being better
+        double normalizedCost = (maxCost - allocation.getCost()) / (maxCost - minCost);
+        double normalizedLatency = (maxLatency - allocation.getLatency()) / (maxLatency - minLatency);
+
+        // Calculate weighted sum
+        double fitness = costWeight * normalizedCost + latencyWeight * normalizedLatency;
+
+        return fitness;
+    	
+    }
     
 }

@@ -66,6 +66,8 @@ public class Allocation {
     	           "Cost: $" + String.format("%.2f", cost) + "\n" +
     	           "Latency: " + latency + "ms";
     }
+    
+  
 
 	
 }

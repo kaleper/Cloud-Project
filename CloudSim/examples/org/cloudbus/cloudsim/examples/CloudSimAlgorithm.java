@@ -45,7 +45,7 @@ import org.cloudbus.cloudsim.lists.HostList;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
-
+//TODO: ALIGN COSTS PROPERLY, WAS NOT USING GB PREVIOUSLY
 
 /**
  * A simple example showing how to create
@@ -89,11 +89,15 @@ public class CloudSimAlgorithm {
 			// First model has Adjusted Datacenter prices to more closely reflect real world pricing. Prices are in dollars
 			// Params: Archetype, OS, VMM, Time_zone(of resource), Cost(GB per month), costPerMem(GB per month), costPerStorage(GB per month), costPerBw
 	
-			DatacenterModel datacenterModel1 = new DatacenterModel("x86", "Linux", "Xen", 10.0, 0.02, 0.01, 0.002, 0.001);
-			DatacenterModel datacenterModel2 = new DatacenterModel("x86", "Linux", "Xen", 7.0, 0.03, 0.02, 0.0032, 0.0015);
-			DatacenterModel datacenterModel3 = new DatacenterModel("x86", "Linux", "Xen", 12.0, 0.015, 0.013, 0.001, 0.0005);
-			DatacenterModel datacenterModel4 = new DatacenterModel("x86", "Linux", "Xen", 4.0, 0.025, 0.022, 0.0024, 0.0010);
-			DatacenterModel datacenterModel5 = new DatacenterModel("x86", "Linux", "Xen", 6.0, 0.020, 0.018, 0.0029, 0.0008);
+			
+			// MOST Expensive Datacenter(Model2): Cost(GB per month): 0.09, costPerMem(GB per month): 0.025, costPerStorage: 0.0032 , costPerBw: 0.0015
+			// Least Expensive Datacenter (Model3): Cost(GB per month): 0.04, costperMem(GB per month): 0.01, costPerStorage: 0.001, costPerBw: 0.0005
+			
+			DatacenterModel datacenterModel1 = new DatacenterModel("x86", "Linux", "Xen", 12.0, 0.06, 0.013, 0.02, 0.01);
+			DatacenterModel datacenterModel2 = new DatacenterModel("x86", "Linux", "Xen", 0.0, 0.09, 0.025, 0.032, 0.015);
+			DatacenterModel datacenterModel3 = new DatacenterModel("x86", "Linux", "Xen", 3.0, 0.04, 0.01, 0.01, 0.005);
+			DatacenterModel datacenterModel4 = new DatacenterModel("x86", "Linux", "Xen", 0, 0.05, 0.022, 0.024, 0.010);
+			DatacenterModel datacenterModel5 = new DatacenterModel("x86", "Linux", "Xen", 6.0, 0.07, 0.018, 0.029, 0.008);
 
 			// Put all the different models in a list
 			List<DatacenterModel> datacenterModels = Arrays.asList(datacenterModel1, datacenterModel2, datacenterModel3, datacenterModel4, datacenterModel5);
@@ -135,10 +139,13 @@ public class CloudSimAlgorithm {
 			// Different models with different specifications. 
 			// These models will be randomized into actual instances of VMs.
 			// Params id, MIPS, image size (MB), memory (MB), Bandwith, # of cpus, VMM name
+			// Most expensive VM(Model4): MIPS: 650 Storage: 18000. RAM: 2048. Bandwidth: 2000 
+			// Least expensive VM(Model1): MIPS: 250 Storage: 10000. RAM: 512. Bandwidth: 1000
+			
 			VMModel vmModel1 = new VMModel(0, 250, 10000, 512, 1000, 1, "Xen");
 			VMModel vmModel2 = new VMModel(1, 500, 15000, 1024, 1500, 1, "VirtualBox");
 			VMModel vmModel3 = new VMModel(2, 350, 12000, 768, 1200, 1, "VMPower");
-			VMModel vmModel4 = new VMModel(3, 350, 18000, 2048, 2000, 1, "FastVM");
+			VMModel vmModel4 = new VMModel(3, 650, 18000, 2048, 2000, 1, "FastVM");
 			VMModel vmModel5 = new VMModel(4, 350, 13500, 2048, 1600, 1, "Mirror");
 
 			// Put all the different models in a list
@@ -294,18 +301,35 @@ public class CloudSimAlgorithm {
 			
 	
 			System.out.println("-----------------------");
-			System.out.println("Creating all allocations:");
+			System.out.println("CHROMOSOME: ALL ALLOCATION INFORMATION:");
 			Chromosome chromosome = new Chromosome();
 			allocateAllVmsRandomly(chromosome, datacenters, vmlist);
 			chromosome.printAllAllocations();
 			
+			System.out.println("-----------------------");
+			System.out.println("FITNESS CALCULATION FIRST ALLOCATION:");
+			
+			// Min latency = 1ms, Max latency = 255ms.
+			// Min latency = 1ms, Max latency = 255ms.
+			
+			// Most expensive VM(Model4): MIPS: 650 Storage: 18000. RAM: 2048. Bandwidth: 2000 
+			// Least expensive VM(Model1): MIPS: 250 Storage: 10000. RAM: 512. Bandwidth: 1000
+			// MOST Expensive Datacenter(Model2): Cost(GB per month): 0.09, costPerMem(GB per month): 0.025, costPerStorage: 0.0032 , costPerBw: 0.0015
+				// Most expensive cost total = 42.6119
+			// Least Expensive Datacenter (Model3): Cost(GB per month): 0.04, costperMem(GB per month): 0.01, costPerStorage: 0.001, costPerBw: 0.0005
+				// Least expensive cost total = 7.222 
+			double fitness = chromosome.calculateFitness(7.222, 42.6119, 1, 255, chromosome.getAllocation(0));
+			System.out.println(fitness);
+					
+					//(7.222, 42.6119, 1, 255, chromosome.getAllocation(2));
 			
 			
 			
 			//System.out.println(datacenters.get(4).getCharacteristics().getTimeZone());
 		
-			// COST OF ONE VM
-//			System.out.println(getCostOfSingleVM(datacenters.getFirst(), vmlist.getFirst()));
+			
+			
+			
 			
 		}
 		catch (Exception e) {
@@ -444,8 +468,22 @@ public class CloudSimAlgorithm {
 	}
 	// TODO: Figure out way to make this cost function work. Lists VS just using separate values individually? Can't access VMlist / database.characteristics due to protected status
 	public static double getCostOfSingleVM(Datacenter datacenter, Vm vm) {
-
+		
+		
+	
+		
+		
+		// Min latency = 1ms, Max latency = 255ms.
+		
+		// Most expensive VM(Model4): MIPS: 650 Storage: 18000. RAM: 2048. Bandwidth: 2000 
+		// Least expensive VM(Model1): MIPS: 250 Storage: 10000. RAM: 512. Bandwidth: 1000
+		// MOST Expensive Datacenter(Model2): Cost(GB per month): 0.09, costPerMem(GB per month): 0.025, costPerStorage: 0.0032 , costPerBw: 0.0015
+			// Most expensive total = 42.6119
+		// Least Expensive Datacenter (Model3): Cost(GB per month): 0.04, costperMem(GB per month): 0.01, costPerStorage: 0.001, costPerBw: 0.0005
+			// Least expensive total = 7.222                                             
+		
 		// Datacenter pricing rates
+		
 		
 			// Assume dollars per GB / month
 			double memoryRate = datacenter.getCharacteristics().getCostPerMem();
@@ -484,15 +522,15 @@ public class CloudSimAlgorithm {
 		
 			// 1000 MIPS per processor, 
 			// https://learn.microsoft.com/en-us/azure/virtual-machines/workloads/mainframe-rehosting/concepts/mainframe-compute-azure
-			double processingCost = processingRate * (vmProcessing/1000) * usageHrsPerMonth;
+			double processingCost = processingRate * (vmProcessingGB/1000) * usageHrsPerMonth;
 			
 	
-			double memoryCost = memoryRate * vmMemory;
-			double storageCost = storageRate * vmStorage;
+			double memoryCost = memoryRate * vmMemoryGB;
+			double storageCost = storageRate * vmStorageGB;
 			// Usually free from big data centers like Microsoft for some? Rate set very low
 			//https://azure.microsoft.com/en-us/pricing/details/bandwidth/
 			// Most cloud providers charge gb per month
-			double bwCost = bwRate * vmBw;
+			double bwCost = bwRate * vmBwGB;
 			
 			double totalCost = memoryCost + storageCost + processingCost + bwCost;
 			// Test case using current numbers come out to $29.72, closer to real world pricing compared to previous pricing
@@ -538,6 +576,7 @@ public class CloudSimAlgorithm {
 		double datacenterTimezone = datacenter.getCharacteristics().getTimeZone();
 		double vmTimezone = vm.getTime_zone();
 		
+		// Multiple of between 15-20 to account for randomness and other variables
 		latency +=  Math.abs(datacenterTimezone - vmTimezone) * ((int) (Math.random() * 6) + 15);
 		return latency;
 		
