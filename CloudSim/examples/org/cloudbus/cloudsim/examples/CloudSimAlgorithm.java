@@ -121,9 +121,36 @@ public class CloudSimAlgorithm {
 			// Population instantiation
 			int populationSize = 5;
 			Population population1 = new Population(populationSize);
+			
 
 			population1.initializePopulation(numberOfVms, brokerId, numberOfDataCenters, datacenters, vmlist,
 					datacenterModels, vmModels);
+			
+			
+			/** TESTING OUT SELECTION **/
+			
+//			 // Print the initial population and their fitness
+//	        System.out.println("Initial population:");
+//	        for (Chromosome chromosome : population1.getChromosomes()) {
+//	            System.out.println("Chromosome fitness: " + chromosome.getFitness());
+//	        }
+//
+//	        // Test tournament selection
+//	        System.out.println("\nSelected parents:");
+//	        
+//	        for (int i = 0; i < 5; i++) { // Select 5 pairs of parents
+//	            Chromosome parent1 = population1.tournamentSelection();
+//	            Chromosome parent2 = population1.tournamentSelection();
+//
+//	            // Ensure parent1 and parent2 are not the same
+//	            while (parent1 == parent2) {
+//	                parent2 = population1.tournamentSelection();
+//	            }
+//
+//	            System.out.println("Parent 1 fitness: " + parent1.getFitness());
+//	            System.out.println("Parent 2 fitness: " + parent2.getFitness());
+//	            System.out.println("---");
+//	        }
 
 			/** Testing populations **/
 			System.out.println(" ");
@@ -224,6 +251,8 @@ public class CloudSimAlgorithm {
 //			// (7.222, 42.6119, 1, 255, chromosome.getAllocation(2));
 //			double chromosomeFitness = chromosome.calculateChromosomeFitness(7.222, 42.6119, 1, 255);
 //			System.out.println(chromosomeFitness);
+			
+		    
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -231,63 +260,6 @@ public class CloudSimAlgorithm {
 		}
 	}
 
-	// /**Migrate to population class**/
-//	private static Datacenter createDatacenter(String name, DatacenterModel model){
-//
-//		// Store hosts in list
-//		List<Host> hostList = new ArrayList<Host>();
-//
-//		// Each machine in my example will only contain one pe / core.
-//		List<Pe> peList = new ArrayList<Pe>();
-//
-//		int mips = 1000;
-//
-//		// Create and add pe's to list. Stores PE Id and MIPS rating
-//		peList.add(new Pe(0, new PeProvisionerSimple(mips))); 
-//
-//		// Create Host with its id and list of PEs and add them to the list of machines
-//		int hostId=0;
-//		// Memory in MB
-//		int ram = 2048; 
-//		// Storage
-//		long storage = 1000000; 
-//		int bw = 10000;
-//
-//		// One VM per PE using the VmScheduleSpaceShared policy.
-//		hostList.add(
-//				
-//			new Host(
-//				hostId,
-//				new RamProvisionerSimple(ram),
-//				new BwProvisionerSimple(bw),
-//				storage,
-//				peList,
-//				new VmSchedulerSpaceShared(peList)
-//			)
-//		); 
-//
-//		// DatacenterCharacteristics makes an instance of the properties of a datacenter.
-//		DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
-//	        model.getArch(), model.getOs(), model.getVmm(), hostList,
-//	        model.getTime_zone(), model.getCost(), model.getCostPerMem(),
-//	        model.getCostPerStorage(), model.getCostPerBw());
-//		
-//		// Assigns timezone to datacenter
-//		System.out.println("CREATING TIME_ZONE:");
-//		System.out.println(model.getTime_zone());
-//		
-//		LinkedList<Storage> storageList = new LinkedList<Storage>();	
-//
-//		// Create a datacenter object using the characteristics and the allocation policy. The allocation policy is actually mainly implemented here, with the allocaiton class just assigning the Pes.
-//		Datacenter datacenter = null;
-//		try {
-//			datacenter = new Datacenter(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return datacenter;
-//	}
 
 	/* Potentially modify */
 	private static DatacenterBroker createBroker() {
@@ -414,4 +386,6 @@ public class CloudSimAlgorithm {
 			cloudletList.add(cloudlet);
 		}
 	}
+	
+	
 }

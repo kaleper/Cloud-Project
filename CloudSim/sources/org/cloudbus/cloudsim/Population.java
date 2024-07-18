@@ -242,5 +242,49 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		populationFitness /= this.chromosomes.size();
 		return populationFitness;
 	}
+	
+	
+	public void doGeneration() {
+		
+		List<Chromosome> newGeneration = new ArrayList<>();
+		
+		// Generate new offspring until it has the same population size
+		for (int i = 0; i < populationSize; i++) {
+			
+			// Get parents 
+			Chromosome mother = tournamentSelection();
+			Chromosome father = tournamentSelection();
+			
+			// Make sure mother and father are not the same to prevent identicalness
+			while (mother == father) {
+				father = tournamentSelection();
+			}
+		}
+	
+	}
+	
+	// Selecting parents part of MOGA
+	public Chromosome tournamentSelection() {
+		
+		// Selects a random chromosome 1 from current population
+		int randomIndex = (int) (Math.random() * chromosomes.size());
+		Chromosome candidate1 = chromosomes.get(randomIndex);
+		
+		// Selects a random chromosome 2 from current population
+		int randomIndex2 = (int) (Math.random() * chromosomes.size());
+		Chromosome candidate2 = chromosomes.get(randomIndex2);
+		
+		// Ensures that two candidates are not the same, otherwise there will be problems of identicalness when crossing over.
+		while (candidate1 == candidate2) {
+			candidate2 = chromosomes.get((int) (Math.random() * chromosomes.size()));
+		}
+		
+		// Find the more fit candidate or chromosome
+		if (candidate1.getFitness() > candidate2.getFitness()) {
+			return candidate1;
+		} else {
+			return candidate2;
+		}
+	}
 }
 
