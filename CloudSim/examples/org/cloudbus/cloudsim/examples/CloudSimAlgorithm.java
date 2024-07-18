@@ -46,33 +46,24 @@ import org.cloudbus.cloudsim.lists.HostList;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
-//TODO: ALIGN COSTS PROPERLY, WAS NOT USING GB PREVIOUSLY
 
-/**
- * A simple example showing how to create
- * two datacenters with one host each and
- * run two cloudlets on them.
- */
 
-//TODO: Add Latency parameters
+/* Running a MOGA alogrithm to optimize VM allocation to hosts for costs and latency */
+
+
 public class CloudSimAlgorithm {
 
 	/** The cloudlet list. */
 	private static List<Cloudlet> cloudletList;
 
-	/** The vmlist. */
-//	private static List<Vm> vmlist;
-
-	/**
-	 * Creates main() to run this example
-	 */
+	/* Program runs off main method */
 	public static void main(String[] args) {
 
 		Log.printLine("Starting CloudSimAlgorithm...");
 
 		try {
-			// First step: Initialize the CloudSim package. It should be called
-			// before creating any entities.
+			
+			// First step: Initialize the CloudSim package. 
 			int num_user = 1;   // number of cloud users
 			Calendar calendar = Calendar.getInstance();
 			boolean trace_flag = false;  // mean trace events
@@ -80,7 +71,7 @@ public class CloudSimAlgorithm {
 			// Initialize the GridSim library
 			CloudSim.init(num_user, calendar, trace_flag);
 
-			// Second step: Create Datacenters.
+			// Second step: Create Datacenters with random data center models.
 			
 			// I'll define how many data centers are created iteratively
 			int numberOfDataCenters = 5;
@@ -105,20 +96,12 @@ public class CloudSimAlgorithm {
 
 			// Randomly assigns a data center model to a data center based on number of data centers specified. Gives each data center unique processing power
 			setHostsFromModels(numberOfDataCenters, datacenterModels, datacenters);
-			
-//			@SuppressWarnings("unused")
-//			Datacenter datacenter0 = createDatacenter("Datacenter_0");
-//			@SuppressWarnings("unused")
-//			Datacenter datacenter1 = createDatacenter("Datacenter_1");
-		
 
 			//Third step: Create Broker
 			DatacenterBroker broker = createBroker();
 			int brokerId = broker.getId();
 
-			//Fourth step: Create one virtual machine
-			
-
+			//Fourth step: Create virtual machines with random vm models.
 			
 			// Different models with different specifications. 
 			// These models will be randomized into actual instances of VMs.
@@ -135,74 +118,24 @@ public class CloudSimAlgorithm {
 			// Put all the different models in a list
 			List<VMModel> vmModels = Arrays.asList(vmModel1, vmModel2, vmModel3, vmModel4, vmModel5);
 			
-			
-//				System.out.println("VM MODEL ID:");
-//				System.out.println(vmModels.get(2).getVmModelId());
 
 			// Will hold all Vm instances with a model associated to it
 			List <Vm> vmlist = new ArrayList<Vm>();
-//			//VM descriptions, pre-class
-//			int vmid = 0;
-//			int mips = 250;
-//			long size = 10000; //image size (MB)
-//			int ram = 512; //vm memory (MB)
-//			long bw = 1000;
-//			int pesNumber = 1; //number of cpus
-//			String vmm = "Xen"; //VMM name
 
 			// Use to define how many VMs will be used 
-			int numberOfVms = 5;
-			
-
-			// Assign VM models to VM
-			for (int i= 0; i < numberOfVms; i++) {
-				
-				  // Generate a random index based on number of models available
-			    int randomVmModelIndex = (int) (Math.random() * (vmModels.size()));
-			    
-			    // Get the model corresponding to the random index
-			    VMModel vmModel = vmModels.get(randomVmModelIndex); 
-				
-			    Vm vm = new Vm(i,vmModel.getVmModelId(), brokerId, vmModel.getMips(),
-	                    vmModel.getPesNumber(), vmModel.getRam(),
-	                    vmModel.getBw(), vmModel.getSize(),
-	                    vmModel.getVmm(), new CloudletSchedulerTimeShared());
-			    
-			    System.out.println("VM ID: " + vm.getId());
-			    System.out.println("VM Model ID: " + vm.getVmModelId());
-	            System.out.println("MIPS: " + vm.getMips());
-	            System.out.println("RAM: " + vm.getRam());
-	            System.out.println("Storage Size: " + vm.getSize());
-	            System.out.println("Bandwidth: " + vm.getBw());
-	            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
-	            System.out.println("VMM: " + vm.getVmm());
-	            System.out.println();
-				
-			    
-				// Add each VM to the VMlist
-				vmlist.add(vm);
-				
-			}
+			int numberOfVms = 5;		
 			
 			// Randomly assigns a vm model to a vm based on number of vms specified. Gives each vm unique processing needs
 			setVmsFromModels(numberOfVms, vmModels,brokerId, vmlist);
 			
 			// Simulate assigning VMs to a user by assigning them a timezone where a user would be (Replicates different geographical locations)
-			
-			for (int i = 0; i < vmlist.size(); i++) {
-				
-				// Generate a random offset between 1 and 12
-				int randomOffset = (int) (Math.random() * 12) + 1;
-				vmlist.get(i).setTime_zone(randomOffset);
-			}
-			
-	
+			assignVmsToUser(vmlist);
 
 			//submit vm list to the broker
 			broker.submitVmList(vmlist);
 
 
-			//Fifth step: Create two Cloudlets
+			//Fifth step: Create CloudLets
 			cloudletList = new ArrayList<Cloudlet>();
 
 			//Cloudlet properties
@@ -213,46 +146,10 @@ public class CloudSimAlgorithm {
 			UtilizationModel utilizationModel = new UtilizationModelFull();
 
 	
-			
 			int numberOfCloudlets = 5;
 
-			// Generates cloudlets
-			for (int i= 0; i < numberOfCloudlets; i++) {
-				
-				// 1 IS PES NUMBER; I'm assuming all CPUs have 1 core. Change to pesNumber = ; if needed.
-				Cloudlet cloudlet = new Cloudlet(id, length, 1, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-				cloudlet.setUserId(brokerId);
-				id++;
-
-				
-				// Add each cloudlet to cloudletList
-				cloudletList.add(cloudlet);
-				
-			}
-			
-//			Cloudlet cloudlet1 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-//			cloudlet1.setUserId(brokerId);
-//
-//			id++;
-//			Cloudlet cloudlet2 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-//			cloudlet2.setUserId(brokerId);
-//			
-//			id++;
-//			Cloudlet cloudlet3 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-//			cloudlet3.setUserId(brokerId);
-//			
-//			id++;
-//			Cloudlet cloudlet4 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-//			cloudlet4.setUserId(brokerId);
-//			id++;
-//	
-//
-//			//add the cloudlets to the list
-//			cloudletList.add(cloudlet1);
-//			cloudletList.add(cloudlet2);
-//			cloudletList.add(cloudlet3);
-//			cloudletList.add(cloudlet4);
-	
+			// Create cloudlets 
+			generateCloudlets(id,length,fileSize, outputSize, utilizationModel, numberOfCloudlets, brokerId);
 		
 			//submit cloudlet list to the broker
 			broker.submitCloudletList(cloudletList);
@@ -301,6 +198,7 @@ public class CloudSimAlgorithm {
 			
 			// Most expensive VM(Model4): MIPS: 650 Storage: 18000. RAM: 2048. Bandwidth: 2000 
 			// Least expensive VM(Model1): MIPS: 250 Storage: 10000. RAM: 512. Bandwidth: 1000
+			
 			// MOST Expensive Datacenter(Model2): Cost(GB per month): 0.09, costPerMem(GB per month): 0.025, costPerStorage: 0.0032 , costPerBw: 0.0015
 				// Most expensive cost total = 42.6119
 			// Least Expensive Datacenter (Model3): Cost(GB per month): 0.04, costperMem(GB per month): 0.01, costPerStorage: 0.001, costPerBw: 0.0005
@@ -314,12 +212,6 @@ public class CloudSimAlgorithm {
 			double chromosomeFitness = chromosome.calculateChromosomeFitness(7.222, 42.6119, 1, 255);
 			System.out.print(chromosomeFitness);
 			
-			//System.out.println(datacenters.get(4).getCharacteristics().getTimeZone());
-		
-			
-			
-			
-			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -329,79 +221,51 @@ public class CloudSimAlgorithm {
 
 	private static Datacenter createDatacenter(String name, DatacenterModel model){
 
-		// Here are the steps needed to create a PowerDatacenter:
-		// 1. We need to create a list to store
-		//    our machine
+		// Store hosts in list
 		List<Host> hostList = new ArrayList<Host>();
 
-		// 2. A Machine contains one or more PEs or CPUs/Cores.
-		// In this example, it will have only one core.
+		// Each machine in my example will only contain one pe / core.
 		List<Pe> peList = new ArrayList<Pe>();
 
 		int mips = 1000;
 
-		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		// Create and add pe's to list. Stores PE Id and MIPS rating
+		peList.add(new Pe(0, new PeProvisionerSimple(mips))); 
 
-		//4. Create Host with its id and list of PEs and add them to the list of machines
+		// Create Host with its id and list of PEs and add them to the list of machines
 		int hostId=0;
-		int ram = 2048; //host memory (MB)
-		long storage = 1000000; //host storage
+		// Memory in MB
+		int ram = 2048; 
+		// Storage
+		long storage = 1000000; 
 		int bw = 10000;
-		
-		
 
-
-		//in this example, the VMAllocatonPolicy in use is SpaceShared. It means that only one VM
-		//is allowed to run on each Pe. As each Host has only one Pe, only one VM can run on each Host.
+		// One VM per PE using the VmScheduleSpaceShared policy.
 		hostList.add(
-    			new Host(
-    				hostId,
-    				new RamProvisionerSimple(ram),
-    				new BwProvisionerSimple(bw),
-    				storage,
-    				peList,
-    				new VmSchedulerSpaceShared(peList)
-    			)
-    		); // This is our first machine
+				
+			new Host(
+				hostId,
+				new RamProvisionerSimple(ram),
+				new BwProvisionerSimple(bw),
+				storage,
+				peList,
+				new VmSchedulerSpaceShared(peList)
+			)
+		); 
 
-		// 5. Create a DatacenterCharacteristics object that stores the
-		//    properties of a data center: architecture, OS, list of
-		//    Machines, allocation policy: time- or space-shared, time zone
-		//    and its price (G$/Pe time unit).
-		
-		
-
+		// DatacenterCharacteristics makes an instance of the properties of a datacenter.
 		DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
-		        model.getArch(), model.getOs(), model.getVmm(), hostList,
-		        model.getTime_zone(), model.getCost(), model.getCostPerMem(),
-		        model.getCostPerStorage(), model.getCostPerBw());
+	        model.getArch(), model.getOs(), model.getVmm(), hostList,
+	        model.getTime_zone(), model.getCost(), model.getCostPerMem(),
+	        model.getCostPerStorage(), model.getCostPerBw());
 		
+		// Assigns timezone to datacenter
 		System.out.println("CREATING TIME_ZONE:");
 		System.out.println(model.getTime_zone());
-		// Previous code pre-data center model class creation
-			//		String arch = "x86";      // system architecture
-			//		String os = "Linux";          // operating system
-			//		String vmm = "Xen";
-			//		// Adjusted Datacenter prices to more closely reflect real world pricing. Prices are in dollars
-			//		double time_zone = 10.0;         // time zone this resource located
-			//		// Processing power per hr
-			//		double cost = 0.02;        
-			//		// GB per month
-			//		double costPerMem = 0.01;		
-			//		// GB per month
-			//		double costPerStorage = 0.002;	
-			//		
-			//		double costPerBw = 0.001;
-		LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
-
 		
-	       
-	       
-	
+		LinkedList<Storage> storageList = new LinkedList<Storage>();	
 
-
-		// 6. Finally, we need to create a PowerDatacenter object.
+		// Create a datacenter object using the characteristics and the allocation policy. The allocation policy is actually mainly implemented here, with the allocaiton class just assigning the Pes.
 		Datacenter datacenter = null;
 		try {
 			datacenter = new Datacenter(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
@@ -412,8 +276,7 @@ public class CloudSimAlgorithm {
 		return datacenter;
 	}
 
-	//We strongly encourage users to develop their own broker policies, to submit vms and cloudlets according
-	//to the specific rules of the simulated scenario
+	/* Potentially modify */
 	private static DatacenterBroker createBroker(){
 
 		DatacenterBroker broker = null;
@@ -453,14 +316,10 @@ public class CloudSimAlgorithm {
 						indent + indent + dft.format(cloudlet.getFinishTime()));
 			}
 		}
-
 	}
-	// TODO: Figure out way to make this cost function work. Lists VS just using separate values individually? Can't access VMlist / database.characteristics due to protected status
-	public static double getCostOfSingleVM(Datacenter datacenter, Vm vm) {
-		
-		
 	
-		
+	// Obtains costs of single VM based on it's specifications and what the datacenter charges.
+	public static double getCostOfSingleVM(Datacenter datacenter, Vm vm) {
 		
 		// Min latency = 1ms, Max latency = 255ms.
 		
@@ -472,66 +331,62 @@ public class CloudSimAlgorithm {
 			// Least expensive total = 7.222                                             
 		
 		// Datacenter pricing rates
-		
-		
-			// Assume dollars per GB / month
-			double memoryRate = datacenter.getCharacteristics().getCostPerMem();
-			
-			// Assume dollars per GB / month
-			double storageRate = datacenter.getCharacteristics().getCostPerStorage();
-			// Assume dollars per GB
-			double bwRate = datacenter.getCharacteristics().getCostPerBw();
-			// Equal to cost for processing, dollars per second
-			double processingRate = datacenter.getCharacteristics().getCostPerSecond();
-			
-		
-		// VM characteristics
-			//Assume megabytes per second
-			double vmBw = vm.getBw();
-			// MB
-			double vmStorage = vm.getSize();
-			// Dollars per MB
-			double vmMemory = vm.getRam();
-			//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
-			double vmProcessing = vm.getMips();
-			
-			
-			// Convert the MB to GB
-			double vmBwGB = vmBw / 1024; 
-			// MB
-			double vmStorageGB = vmStorage / 1024;
-			// Dollars per MB
-			double vmMemoryGB = vmMemory / 1024;
-			//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
-			double vmProcessingGB = vm.getMips();
-			
-		
-			// Hours in a month to get usage from user
-			int usageHrsPerMonth = 720;
-		
-			// 1000 MIPS per processor, 
-			// https://learn.microsoft.com/en-us/azure/virtual-machines/workloads/mainframe-rehosting/concepts/mainframe-compute-azure
-			double processingCost = processingRate * (vmProcessingGB/1000) * usageHrsPerMonth;
-			
 	
-			double memoryCost = memoryRate * vmMemoryGB;
-			double storageCost = storageRate * vmStorageGB;
-			// Usually free from big data centers like Microsoft for some? Rate set very low
-			//https://azure.microsoft.com/en-us/pricing/details/bandwidth/
-			// Most cloud providers charge gb per month
-			double bwCost = bwRate * vmBwGB;
-			
-			double totalCost = memoryCost + storageCost + processingCost + bwCost;
-			// Test case using current numbers come out to $29.72, closer to real world pricing compared to previous pricing
-			
+	
+		// Assume dollars per GB / month
+		double memoryRate = datacenter.getCharacteristics().getCostPerMem();
 		
-			
-			return totalCost;
-			
+		// Assume dollars per GB / month
+		double storageRate = datacenter.getCharacteristics().getCostPerStorage();
+		// Assume dollars per GB
+		double bwRate = datacenter.getCharacteristics().getCostPerBw();
+		// Equal to cost for processing, dollars per second
+		double processingRate = datacenter.getCharacteristics().getCostPerSecond();
+		
+	
+		// VM characteristics
+		//Assume megabytes per second
+		double vmBw = vm.getBw();
+		// MB
+		double vmStorage = vm.getSize();
+		// Dollars per MB
+		double vmMemory = vm.getRam();
+		//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
+		double vmProcessing = vm.getMips();
+		
+		// Convert the MB to GB
+		double vmBwGB = vmBw / 1024; 
+		// MB
+		double vmStorageGB = vmStorage / 1024;
+		// Dollars per MB
+		double vmMemoryGB = vmMemory / 1024;
+		//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
+		double vmProcessingGB = vm.getMips();
+		
+		// Hours in a month to get usage from user
+		int usageHrsPerMonth = 720;
+	
+		// 1000 MIPS per processor, 
+		// https://learn.microsoft.com/en-us/azure/virtual-machines/workloads/mainframe-rehosting/concepts/mainframe-compute-azure
+		double processingCost = processingRate * (vmProcessingGB/1000) * usageHrsPerMonth;
+
+		double memoryCost = memoryRate * vmMemoryGB;
+		double storageCost = storageRate * vmStorageGB;
+		
+		// Usually free from big data centers like Microsoft for some? Rate set very low
+		//https://azure.microsoft.com/en-us/pricing/details/bandwidth/
+		// Most cloud providers charge gb per month
+		double bwCost = bwRate * vmBwGB;
+		
+		double totalCost = memoryCost + storageCost + processingCost + bwCost;
+		// Test case using current numbers come out to $29.72, closer to real world pricing compared to previous pricing
+	
+		return totalCost;	
 	}
 	
 	// Currently, obtains cost for vms that are allocated sequentially to available hosts or data centers
 	public static double getTotalCostOfAllVMs(List<Datacenter> datacenters, List<Vm> vmlist) {
+		
 	    double totalCost = 0.0;
 
 	    // Iterates through until the vms are all allocated or there are not enough hosts
@@ -543,17 +398,8 @@ public class CloudSimAlgorithm {
 	        // Calculate the cost of assigning the current VM to the current datacenter
 	        double vmCost = getCostOfSingleVM(datacenter, vm);
 	        totalCost += vmCost;
-
-	     // Test output
-	        //System.out.println("VM " + vm.getId() + " assigned to Datacenter " + datacenter.getId() + ", Cost: $" + vmCost);
 	    }
-
-
-		
-
 		return totalCost;
-	    
-	    
 	}
 	
 	// Latency in MS
@@ -561,90 +407,113 @@ public class CloudSimAlgorithm {
 		
 		// Starting point for latency (between 1-15ms); even if the host and the vm are in the same time zone, expected to have some delay
 		double latency = 1 + Math.random() * 14;
-		
 		double datacenterTimezone = datacenter.getCharacteristics().getTimeZone();
 		double vmTimezone = vm.getTime_zone();
 		
 		// Multiple of between 15-20 to account for randomness and other variables
 		latency +=  Math.abs(datacenterTimezone - vmTimezone) * ((int) (Math.random() * 6) + 15);
-		return latency;
 		
+		return latency;
 			
 	}
 	
 	// Iterate through all VMS to allocate to hosts randomly
-		public static void allocateAllVmsRandomly(Chromosome chromosome, List<Datacenter> datacenters, List<Vm> vmlist) {
+	public static void allocateAllVmsRandomly(Chromosome chromosome, List<Datacenter> datacenters, List<Vm> vmlist) {
+		
+		// Iterates through until the vms are all allocated or there are not enough hosts
+	    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
+	    	
+    	 	Vm vm = vmlist.get(i);
+	        Datacenter datacenter = datacenters.get(i);
+	        
+	        // Calculate the cost of assigning the current VM to the current datacenter
+	        double vmCost = getCostOfSingleVM(datacenter, vm);
+	        
+	        // Calculate the latency of assigning the current VM to the current datacenter
+	        double vmLatency= calculateLatencyCost(datacenter, vm);
+	        
+	        // Save allocation details
+	        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
+	        
+	        chromosome.addAllocation(allocation);     
+	    }
+	}
+	
+	public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterModel> datacenterModels, List <Datacenter> datacenters) {
+		
+		/* Loop to create however many data centers I specify.
+		 * This randomization currently assumes that more than one data center can share the same types of models. Now when cost is calculated, 
+		 * the total costs of all VMs are different everytime. */
+		for (int i = 0; i < numberOfDataCenters; i++) {
 			
-			// Iterates through until the vms are all allocated or there are not enough hosts
-		    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
-		    	 	Vm vm = vmlist.get(i);
-			        Datacenter datacenter = datacenters.get(i);
-			        
-			        // Calculate the cost of assigning the current VM to the current datacenter
-			        double vmCost = getCostOfSingleVM(datacenter, vm);
-			        
-			        // Calculate the latency of assigning the current VM to the current datacenter
-			        double vmLatency= calculateLatencyCost(datacenter, vm);
-			        
-			        // Save allocation details
-			        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
-			        
-			        chromosome.addAllocation(allocation);
-			        
-		    }
+		    // Generate a random index based on number of models available
+		    int randomDataCenterModelIndex = (int) (Math.random() * datacenterModels.size()); 
 		    
+		    // Get the model corresponding to the random index
+		    DatacenterModel randomModel = datacenterModels.get(randomDataCenterModelIndex); 
+		    
+		    // Create a Datacenter using the random model
+		    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
+		    
+		    // Add the datacenter to the list
+		    datacenters.add(datacenter);
 		}
+	}
+	
+	public static void setVmsFromModels(int numberOfVms, List<VMModel> vmModels, int brokerId, List <Vm> vmlist) {
 		
-		public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterModel> datacenterModels, List <Datacenter> datacenters) {
-			// Loop to create however many data centers I specify
-		// This randomization currently assumes that more than one data center can share the same types of models. Now when cost is calculated, 
-			// the total costs of all VMs are different everytime.
-			for (int i = 0; i < numberOfDataCenters; i++) {
-				
-			    // Generate a random index based on number of models available
-			    int randomDataCenterModelIndex = (int) (Math.random() * datacenterModels.size()); 
-			    
-			    // Get the model corresponding to the random index
-			    DatacenterModel randomModel = datacenterModels.get(randomDataCenterModelIndex); 
-			    
-			    // Create a Datacenter using the random model
-			    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
-			    
-			    // Add the datacenter to the list
-			    datacenters.add(datacenter);
-			}
+		// Assign VM models to VM
+		for (int i= 0; i < numberOfVms; i++) {
+			
+			// Generate a random index based on number of models available
+		    int randomVmModelIndex = (int) (Math.random() * (vmModels.size()));
+		    
+		    // Get the model corresponding to the random index
+		    VMModel vmModel = vmModels.get(randomVmModelIndex); 
+			
+		    Vm vm = new Vm(i,vmModel.getVmModelId(), brokerId, vmModel.getMips(),
+                    vmModel.getPesNumber(), vmModel.getRam(),
+                    vmModel.getBw(), vmModel.getSize(),
+                    vmModel.getVmm(), new CloudletSchedulerTimeShared());
+		    
+		    /** Test 0utput to be deleted later **/
+		    System.out.println("VM ID: " + vm.getId());
+		    System.out.println("VM Model ID: " + vm.getVmModelId());
+            System.out.println("MIPS: " + vm.getMips());
+            System.out.println("RAM: " + vm.getRam());
+            System.out.println("Storage Size: " + vm.getSize());
+            System.out.println("Bandwidth: " + vm.getBw());
+            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
+            System.out.println("VMM: " + vm.getVmm());
+            System.out.println();
+		    
+			// Add each VM to the VMlist
+			vmlist.add(vm);
 		}
+	}
+	
+	// Simulate assigning VMs to a user by assigning them a timezone where a user would be (Replicates different geographical locations)
+	public static void assignVmsToUser(List <Vm> vmlist){
+	
+	for (int i = 0; i < vmlist.size(); i++) {
 		
-		public static void setVmsFromModels(int numberOfVms, List<VMModel> vmModels, int brokerId, List <Vm> vmlist) {
-			// Assign VM models to VM
-			for (int i= 0; i < numberOfVms; i++) {
-				
-				  // Generate a random index based on number of models available
-			    int randomVmModelIndex = (int) (Math.random() * (vmModels.size()));
-			    
-			    // Get the model corresponding to the random index
-			    VMModel vmModel = vmModels.get(randomVmModelIndex); 
-				
-			    Vm vm = new Vm(i,vmModel.getVmModelId(), brokerId, vmModel.getMips(),
-	                    vmModel.getPesNumber(), vmModel.getRam(),
-	                    vmModel.getBw(), vmModel.getSize(),
-	                    vmModel.getVmm(), new CloudletSchedulerTimeShared());
-			    
-			    System.out.println("VM ID: " + vm.getId());
-			    System.out.println("VM Model ID: " + vm.getVmModelId());
-	            System.out.println("MIPS: " + vm.getMips());
-	            System.out.println("RAM: " + vm.getRam());
-	            System.out.println("Storage Size: " + vm.getSize());
-	            System.out.println("Bandwidth: " + vm.getBw());
-	            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
-	            System.out.println("VMM: " + vm.getVmm());
-	            System.out.println();
-				
-			    
-				// Add each VM to the VMlist
-				vmlist.add(vm);
-				
-			}
-		}
+		// Generate a random offset between 1 and 12
+		int randomOffset = (int) (Math.random() * 12) + 1;
+		vmlist.get(i).setTime_zone(randomOffset);
+	}
+}
 
+	// Generates cloudlets
+	public static void generateCloudlets(int id, long length, long fileSize, long outputSize, UtilizationModel utilizationModel, int numberOfCloudlets, int brokerId) {
+		for (int i= 0; i < numberOfCloudlets; i++) {
+			
+			// 1 IS PES NUMBER; I'm assuming all CPUs have 1 core. Change to pesNumber = ; if needed.
+			Cloudlet cloudlet = new Cloudlet(id, length, 1, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			cloudlet.setUserId(brokerId);
+			id++;
+
+			// Add each cloudlet to cloudletList
+			cloudletList.add(cloudlet);
+		} 		
+	}
 }
