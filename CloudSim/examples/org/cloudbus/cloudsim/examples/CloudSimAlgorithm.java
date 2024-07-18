@@ -39,6 +39,7 @@ import org.cloudbus.cloudsim.UtilizationModelFull;
 import org.cloudbus.cloudsim.VMModel;
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.VmAllocationPolicySimple;
+import org.cloudbus.cloudsim.VmAllocationPolicyImplementation;
 import org.cloudbus.cloudsim.VmSchedulerSpaceShared;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.lists.HostList;
@@ -102,26 +103,9 @@ public class CloudSimAlgorithm {
 			// Put all the different models in a list
 			List<DatacenterModel> datacenterModels = Arrays.asList(datacenterModel1, datacenterModel2, datacenterModel3, datacenterModel4, datacenterModel5);
 
+			// Randomly assigns a data center model to a data center based on number of data centers specified. Gives each data center unique processing power
+			setHostsFromModels(numberOfDataCenters, datacenterModels, datacenters);
 			
-			
-			// Loop to create however many data centers I specify
-			// This randomization currently assumes that more than one data center can share the same types of models. Now when cost is calculated, 
-			// the total costs of all VMs are different everytime.
-			for (int i = 0; i < numberOfDataCenters; i++) {
-				
-			    // Generate a random index based on number of models available
-			    int randomDataCenterModelIndex = (int) (Math.random() * datacenterModels.size()); 
-			    
-			    // Get the model corresponding to the random index
-			    DatacenterModel randomModel = datacenterModels.get(randomDataCenterModelIndex); 
-			    
-			    // Create a Datacenter using the random model
-			    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
-			    
-			    // Add the datacenter to the list
-			    datacenters.add(datacenter);
-			}
-		
 //			@SuppressWarnings("unused")
 //			Datacenter datacenter0 = createDatacenter("Datacenter_0");
 //			@SuppressWarnings("unused")
@@ -199,6 +183,9 @@ public class CloudSimAlgorithm {
 				vmlist.add(vm);
 				
 			}
+			
+			// Randomly assigns a vm model to a vm based on number of vms specified. Gives each vm unique processing needs
+			setVmsFromModels(numberOfVms, vmModels,brokerId, vmlist);
 			
 			// Simulate assigning VMs to a user by assigning them a timezone where a user would be (Replicates different geographical locations)
 			
@@ -606,11 +593,58 @@ public class CloudSimAlgorithm {
 			        
 		    }
 		    
-		    
-			
-		    
-		  
+		}
+		
+		public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterModel> datacenterModels, List <Datacenter> datacenters) {
+			// Loop to create however many data centers I specify
+		// This randomization currently assumes that more than one data center can share the same types of models. Now when cost is calculated, 
+			// the total costs of all VMs are different everytime.
+			for (int i = 0; i < numberOfDataCenters; i++) {
 				
+			    // Generate a random index based on number of models available
+			    int randomDataCenterModelIndex = (int) (Math.random() * datacenterModels.size()); 
+			    
+			    // Get the model corresponding to the random index
+			    DatacenterModel randomModel = datacenterModels.get(randomDataCenterModelIndex); 
+			    
+			    // Create a Datacenter using the random model
+			    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
+			    
+			    // Add the datacenter to the list
+			    datacenters.add(datacenter);
+			}
+		}
+		
+		public static void setVmsFromModels(int numberOfVms, List<VMModel> vmModels, int brokerId, List <Vm> vmlist) {
+			// Assign VM models to VM
+			for (int i= 0; i < numberOfVms; i++) {
+				
+				  // Generate a random index based on number of models available
+			    int randomVmModelIndex = (int) (Math.random() * (vmModels.size()));
+			    
+			    // Get the model corresponding to the random index
+			    VMModel vmModel = vmModels.get(randomVmModelIndex); 
+				
+			    Vm vm = new Vm(i,vmModel.getVmModelId(), brokerId, vmModel.getMips(),
+	                    vmModel.getPesNumber(), vmModel.getRam(),
+	                    vmModel.getBw(), vmModel.getSize(),
+	                    vmModel.getVmm(), new CloudletSchedulerTimeShared());
+			    
+			    System.out.println("VM ID: " + vm.getId());
+			    System.out.println("VM Model ID: " + vm.getVmModelId());
+	            System.out.println("MIPS: " + vm.getMips());
+	            System.out.println("RAM: " + vm.getRam());
+	            System.out.println("Storage Size: " + vm.getSize());
+	            System.out.println("Bandwidth: " + vm.getBw());
+	            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
+	            System.out.println("VMM: " + vm.getVmm());
+	            System.out.println();
+				
+			    
+				// Add each VM to the VMlist
+				vmlist.add(vm);
+				
+			}
 		}
 
 }
