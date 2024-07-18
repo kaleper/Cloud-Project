@@ -1,17 +1,3 @@
-/*
- * Title:        CloudSim Toolkit
- * Description:  CloudSim (Cloud Simulation) Toolkit for Modeling and Simulation
- *               of Clouds
- * Licence:      GPL - http://www.gnu.org/copyleft/gpl.html
- *
- * Copyright (c) 2009, The University of Melbourne, Australia
- */
-
-/* TODO: 1. Currently, all specifications are made to be uniform in specification. Randomization is needed to initial specifications before being fed into loops to initialize; 
- * 			Randomization criteria to be entered to make characteristics heterogeneous
- * 
- */
-
 package org.cloudbus.cloudsim.examples;
 
 import java.text.DecimalFormat;
@@ -49,7 +35,6 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 
 
 /* Running a MOGA alogrithm to optimize VM allocation to hosts for costs and latency */
-
 
 public class CloudSimAlgorithm {
 
@@ -174,20 +159,23 @@ public class CloudSimAlgorithm {
 
 			Log.printLine("CloudSimAlgorithm finished!");
 			
-			/** TEST CASE **/
+			/** TEST CASES **/
+			
+			Chromosome chromosome = new Chromosome();
+			
 			// COST OF ALL VMS
 			System.out.println("-----------------------");
 			System.out.println("COST OF ALL VMS:");
-			System.out.println("$" + getTotalCostOfAllVMs(datacenters, vmlist) + " /month");
+			System.out.println("$" + chromosome.getTotalCostOfAllVMs(datacenters, vmlist) + " /month");
 			System.out.println("-----------------------");
 			System.out.println("LATENCY COST FOR THE FIRST DATA CENTER");
-			System.out.println(calculateLatencyCost(datacenters.getFirst(), vmlist.getFirst()) + " ms");
+			System.out.println(chromosome.calculateLatencyCost(datacenters.getFirst(), vmlist.getFirst()) + " ms");
 			
 	
 			System.out.println("-----------------------");
 			System.out.println("CHROMOSOME: ALL ALLOCATION INFORMATION:");
-			Chromosome chromosome = new Chromosome();
-			allocateAllVmsRandomly(chromosome, datacenters, vmlist);
+			
+			chromosome.allocateAllVmsRandomly(chromosome, datacenters, vmlist);
 			chromosome.printAllAllocations();
 			
 			System.out.println("-----------------------");
@@ -317,127 +305,130 @@ public class CloudSimAlgorithm {
 			}
 		}
 	}
+	/** Currently being moved to chromosome class for more modularity **/
+//	// Obtains costs of single VM based on it's specifications and what the datacenter charges.
+//	public static double getCostOfSingleVM(Datacenter datacenter, Vm vm) {
+//		
+//		// Min latency = 1ms, Max latency = 255ms.
+//		
+//		// Most expensive VM(Model4): MIPS: 650 Storage: 18000. RAM: 2048. Bandwidth: 2000 
+//		// Least expensive VM(Model1): MIPS: 250 Storage: 10000. RAM: 512. Bandwidth: 1000
+//		// MOST Expensive Datacenter(Model2): Cost(GB per month): 0.09, costPerMem(GB per month): 0.025, costPerStorage: 0.0032 , costPerBw: 0.0015
+//			// Most expensive total = 42.6119
+//		// Least Expensive Datacenter (Model3): Cost(GB per month): 0.04, costperMem(GB per month): 0.01, costPerStorage: 0.001, costPerBw: 0.0005
+//			// Least expensive total = 7.222                                             
+//		
+//		// Datacenter pricing rates
+//	
+//	
+//		// Assume dollars per GB / month
+//		double memoryRate = datacenter.getCharacteristics().getCostPerMem();
+//		
+//		// Assume dollars per GB / month
+//		double storageRate = datacenter.getCharacteristics().getCostPerStorage();
+//		// Assume dollars per GB
+//		double bwRate = datacenter.getCharacteristics().getCostPerBw();
+//		// Equal to cost for processing, dollars per second
+//		double processingRate = datacenter.getCharacteristics().getCostPerSecond();
+//		
+//	
+//		// VM characteristics
+//		//Assume megabytes per second
+//		double vmBw = vm.getBw();
+//		// MB
+//		double vmStorage = vm.getSize();
+//		// Dollars per MB
+//		double vmMemory = vm.getRam();
+//		//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
+//		double vmProcessing = vm.getMips();
+//		
+//		// Convert the MB to GB
+//		double vmBwGB = vmBw / 1024; 
+//		// MB
+//		double vmStorageGB = vmStorage / 1024;
+//		// Dollars per MB
+//		double vmMemoryGB = vmMemory / 1024;
+//		//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
+//		double vmProcessingGB = vm.getMips();
+//		
+//		// Hours in a month to get usage from user
+//		int usageHrsPerMonth = 720;
+//	
+//		// 1000 MIPS per processor, 
+//		// https://learn.microsoft.com/en-us/azure/virtual-machines/workloads/mainframe-rehosting/concepts/mainframe-compute-azure
+//		double processingCost = processingRate * (vmProcessingGB/1000) * usageHrsPerMonth;
+//
+//		double memoryCost = memoryRate * vmMemoryGB;
+//		double storageCost = storageRate * vmStorageGB;
+//		
+//		// Usually free from big data centers like Microsoft for some? Rate set very low
+//		//https://azure.microsoft.com/en-us/pricing/details/bandwidth/
+//		// Most cloud providers charge gb per month
+//		double bwCost = bwRate * vmBwGB;
+//		
+//		double totalCost = memoryCost + storageCost + processingCost + bwCost;
+//		// Test case using current numbers come out to $29.72, closer to real world pricing compared to previous pricing
+//	
+//		return totalCost;	
+//	}
 	
-	// Obtains costs of single VM based on it's specifications and what the datacenter charges.
-	public static double getCostOfSingleVM(Datacenter datacenter, Vm vm) {
-		
-		// Min latency = 1ms, Max latency = 255ms.
-		
-		// Most expensive VM(Model4): MIPS: 650 Storage: 18000. RAM: 2048. Bandwidth: 2000 
-		// Least expensive VM(Model1): MIPS: 250 Storage: 10000. RAM: 512. Bandwidth: 1000
-		// MOST Expensive Datacenter(Model2): Cost(GB per month): 0.09, costPerMem(GB per month): 0.025, costPerStorage: 0.0032 , costPerBw: 0.0015
-			// Most expensive total = 42.6119
-		// Least Expensive Datacenter (Model3): Cost(GB per month): 0.04, costperMem(GB per month): 0.01, costPerStorage: 0.001, costPerBw: 0.0005
-			// Least expensive total = 7.222                                             
-		
-		// Datacenter pricing rates
-	
-	
-		// Assume dollars per GB / month
-		double memoryRate = datacenter.getCharacteristics().getCostPerMem();
-		
-		// Assume dollars per GB / month
-		double storageRate = datacenter.getCharacteristics().getCostPerStorage();
-		// Assume dollars per GB
-		double bwRate = datacenter.getCharacteristics().getCostPerBw();
-		// Equal to cost for processing, dollars per second
-		double processingRate = datacenter.getCharacteristics().getCostPerSecond();
-		
-	
-		// VM characteristics
-		//Assume megabytes per second
-		double vmBw = vm.getBw();
-		// MB
-		double vmStorage = vm.getSize();
-		// Dollars per MB
-		double vmMemory = vm.getRam();
-		//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
-		double vmProcessing = vm.getMips();
-		
-		// Convert the MB to GB
-		double vmBwGB = vmBw / 1024; 
-		// MB
-		double vmStorageGB = vmStorage / 1024;
-		// Dollars per MB
-		double vmMemoryGB = vmMemory / 1024;
-		//***DON'T NEED TO USE?? MIPS IS STANDARD, plan to increase price based on MIPS, or faster computers
-		double vmProcessingGB = vm.getMips();
-		
-		// Hours in a month to get usage from user
-		int usageHrsPerMonth = 720;
-	
-		// 1000 MIPS per processor, 
-		// https://learn.microsoft.com/en-us/azure/virtual-machines/workloads/mainframe-rehosting/concepts/mainframe-compute-azure
-		double processingCost = processingRate * (vmProcessingGB/1000) * usageHrsPerMonth;
-
-		double memoryCost = memoryRate * vmMemoryGB;
-		double storageCost = storageRate * vmStorageGB;
-		
-		// Usually free from big data centers like Microsoft for some? Rate set very low
-		//https://azure.microsoft.com/en-us/pricing/details/bandwidth/
-		// Most cloud providers charge gb per month
-		double bwCost = bwRate * vmBwGB;
-		
-		double totalCost = memoryCost + storageCost + processingCost + bwCost;
-		// Test case using current numbers come out to $29.72, closer to real world pricing compared to previous pricing
-	
-		return totalCost;	
-	}
-	
+	//** Currently being moved to chromosome class for more modularity *** */
 	// Currently, obtains cost for vms that are allocated sequentially to available hosts or data centers
-	public static double getTotalCostOfAllVMs(List<Datacenter> datacenters, List<Vm> vmlist) {
-		
-	    double totalCost = 0.0;
-
-	    // Iterates through until the vms are all allocated or there are not enough hosts
-	    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
-	    	
-	        Vm vm = vmlist.get(i);
-	        Datacenter datacenter = datacenters.get(i);
-
-	        // Calculate the cost of assigning the current VM to the current datacenter
-	        double vmCost = getCostOfSingleVM(datacenter, vm);
-	        totalCost += vmCost;
-	    }
-		return totalCost;
-	}
+//	public static double getTotalCostOfAllVMs(List<Datacenter> datacenters, List<Vm> vmlist) {
+//		
+//	    double totalCost = 0.0;
+//
+//	    // Iterates through until the vms are all allocated or there are not enough hosts
+//	    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
+//	    	
+//	        Vm vm = vmlist.get(i);
+//	        Datacenter datacenter = datacenters.get(i);
+//
+//	        // Calculate the cost of assigning the current VM to the current datacenter
+//	        double vmCost = getCostOfSingleVM(datacenter, vm);
+//	        totalCost += vmCost;
+//	    }
+//		return totalCost;
+//	}
 	
+	/* *** Currently moving to chromosome function for more modularity *** */
 	// Latency in MS
-	public static double calculateLatencyCost(Datacenter datacenter, Vm vm) {
-		
-		// Starting point for latency (between 1-15ms); even if the host and the vm are in the same time zone, expected to have some delay
-		double latency = 1 + Math.random() * 14;
-		double datacenterTimezone = datacenter.getCharacteristics().getTimeZone();
-		double vmTimezone = vm.getTime_zone();
-		
-		// Multiple of between 15-20 to account for randomness and other variables
-		latency +=  Math.abs(datacenterTimezone - vmTimezone) * ((int) (Math.random() * 6) + 15);
-		
-		return latency;
-			
-	}
+//	public static double calculateLatencyCost(Datacenter datacenter, Vm vm) {
+//		
+//		// Starting point for latency (between 1-15ms); even if the host and the vm are in the same time zone, expected to have some delay
+//		double latency = 1 + Math.random() * 14;
+//		double datacenterTimezone = datacenter.getCharacteristics().getTimeZone();
+//		double vmTimezone = vm.getTime_zone();
+//		
+//		// Multiple of between 15-20 to account for randomness and other variables
+//		latency +=  Math.abs(datacenterTimezone - vmTimezone) * ((int) (Math.random() * 6) + 15);
+//		
+//		return latency;
+//			
+//	}
 	
+	/* *** Currently moving to chromosome function for more modularity *** */
 	// Iterate through all VMS to allocate to hosts randomly
-	public static void allocateAllVmsRandomly(Chromosome chromosome, List<Datacenter> datacenters, List<Vm> vmlist) {
-		
-		// Iterates through until the vms are all allocated or there are not enough hosts
-	    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
-	    	
-    	 	Vm vm = vmlist.get(i);
-	        Datacenter datacenter = datacenters.get(i);
-	        
-	        // Calculate the cost of assigning the current VM to the current datacenter
-	        double vmCost = getCostOfSingleVM(datacenter, vm);
-	        
-	        // Calculate the latency of assigning the current VM to the current datacenter
-	        double vmLatency= calculateLatencyCost(datacenter, vm);
-	        
-	        // Save allocation details
-	        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
-	        
-	        chromosome.addAllocation(allocation);     
-	    }
-	}
+//	public static void allocateAllVmsRandomly(Chromosome chromosome, List<Datacenter> datacenters, List<Vm> vmlist) {
+//		
+//		// Iterates through until the vms are all allocated or there are not enough hosts
+//	    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
+//	    	
+//    	 	Vm vm = vmlist.get(i);
+//	        Datacenter datacenter = datacenters.get(i);
+//	        
+//	        // Calculate the cost of assigning the current VM to the current datacenter
+//	        double vmCost = getCostOfSingleVM(datacenter, vm);
+//	        
+//	        // Calculate the latency of assigning the current VM to the current datacenter
+//	        double vmLatency= calculateLatencyCost(datacenter, vm);
+//	        
+//	        // Save allocation details
+//	        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
+//	        
+//	        chromosome.addAllocation(allocation);     
+//	    }
+//	}
 	
 	public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterModel> datacenterModels, List <Datacenter> datacenters) {
 		
