@@ -321,9 +321,11 @@ public class CloudSimAlgorithm {
 			double fitness = chromosome.calculateFitness(7.222, 42.6119, 1, 255, chromosome.getAllocation(0));
 			System.out.println(fitness);
 					
+			System.out.println("-----------------------");
+			System.out.println("FITNESS CALCULATION ALL ALLOCATIONS");
 					//(7.222, 42.6119, 1, 255, chromosome.getAllocation(2));
-			
-			
+			double chromosomeFitness = chromosome.calculateChromosomeFitness(7.222, 42.6119, 1, 255);
+			System.out.print(chromosomeFitness);
 			
 			//System.out.println(datacenters.get(4).getCharacteristics().getTimeZone());
 		

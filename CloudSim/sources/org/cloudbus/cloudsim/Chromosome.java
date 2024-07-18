@@ -94,4 +94,29 @@ public class Chromosome {
     	
     }
     
+ public double calculateChromosomeFitness(double minCost, double maxCost, int minLatency, int maxLatency) {
+	 
+	 double fitness = 0;
+	 
+	 for (int i = 0; i < this.allocations.size(); i++) {
+		 	// Can change weightings depending on which one I favour more
+	    	// Cost weighted slightly more than latency in my example
+	    	double costWeight = 0.6; 
+	    	// Latency weighted less
+	        double latencyWeight = 0.4; 
+	        
+	     // Reversed normalization to get a cost or latency between 0-1, with closer to 1 being better
+	        double normalizedCost = (maxCost - this.getAllocation(i).getCost()) / (maxCost - minCost);
+	        double normalizedLatency = (maxLatency - this.getAllocation(i).getLatency()) / (maxLatency - minLatency);
+	        // Keeps running total of fitness
+	        fitness += (costWeight * normalizedCost + latencyWeight * normalizedLatency);
+	 }
+	 
+	 // Divides fitness by size of chromosome to get average
+	 fitness/= this.allocations.size();
+	 
+	 return fitness;
+	 
+ }
 }
+
