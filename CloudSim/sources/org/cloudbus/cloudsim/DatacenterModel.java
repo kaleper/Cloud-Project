@@ -3,6 +3,7 @@ package org.cloudbus.cloudsim;
 // Created this class to represent the varying characteristics that hosts will have. This will cause variation when allocating VMs to hosts.
 
 public class DatacenterModel {
+	private int id;
     private String arch;
     private String os;
     private String vmm;
@@ -13,8 +14,9 @@ public class DatacenterModel {
     private double costPerBw;
 
     // Constructor for class
-    public DatacenterModel(String arch, String os, String vmm, double time_zone,
+    public DatacenterModel(int id, String arch, String os, String vmm, double time_zone,
                             double cost, double costPerMem, double costPerStorage, double costPerBw) {
+    	this.id = id;
         this.arch = arch;
         this.os = os;
         this.vmm = vmm;
@@ -89,4 +91,13 @@ public class DatacenterModel {
     public void setCostPerBw(double costPerBw) {
         this.costPerBw = costPerBw;
     }
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+    
 }

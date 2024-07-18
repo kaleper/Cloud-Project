@@ -9,9 +9,13 @@ public class Chromosome {
     private List<Allocation> allocations;
     private double totalCost;
     private double totalLatency;
+    // Stores fitness of entire chromosomes
+    private double fitness;
     
     public Chromosome() {
         this.allocations = new ArrayList<>();
+        //fitness is 0 initially
+        this.fitness= 0.0;
    
     }
 
@@ -56,6 +60,23 @@ public class Chromosome {
 		this.totalLatency = totalLatency;
 	}
 	
+	
+	public List<Allocation> getAllocations() {
+		return allocations;
+	}
+
+	public void setAllocations(List<Allocation> allocations) {
+		this.allocations = allocations;
+	}
+
+	public double getFitness() {
+		return fitness;
+	}
+
+	public void setFitness(double fitness) {
+		this.fitness = fitness;
+	}
+
 	public void printAllAllocations() {
 	    for (Allocation allocation : allocations) {
 	        System.out.println("Allocation ID: " + allocation.getAllocationId());

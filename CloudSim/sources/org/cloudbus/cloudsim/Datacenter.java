@@ -30,6 +30,7 @@ import org.cloudbus.cloudsim.core.SimEvent;
  * @since CloudSim Toolkit 1.0
  */
 public class Datacenter extends SimEntity {
+	private int id;
 
 	/** The characteristics. */
 	private DatacenterCharacteristics characteristics;
@@ -97,8 +98,8 @@ public class Datacenter extends SimEntity {
 					+ " : Error - this entity has no PEs. Therefore, can't process any Cloudlets.");
 		}
 
-		// stores id of this class
-		getCharacteristics().setId(super.getId());
+//		// stores id of this class
+//		getCharacteristics().setId(super.getId());
 	}
 
 	/**
@@ -1175,5 +1176,15 @@ public class Datacenter extends SimEntity {
 	protected void setSchedulingInterval(double schedulingInterval) {
 		this.schedulingInterval = schedulingInterval;
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	
 
 }
