@@ -114,12 +114,12 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		    
 		    // Create a Datacenter using the random model
 		    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
-		    System.out.println("--------");
-		    System.out.println("--------");
-		    System.out.println("DATACENTER ID:");
-		    System.out.println(datacenter.getId());
-		    System.out.println("--------");
-		    System.out.println("--------");
+//		    System.out.println("--------");
+//		    System.out.println("--------");
+//		    System.out.println("DATACENTER ID:");
+//		    System.out.println(datacenter.getId());
+//		    System.out.println("--------");
+//		    System.out.println("--------");
 		    
 		    // Add the datacenter to the list
 		    datacenters.add(datacenter);
@@ -143,15 +143,15 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
                     vmModel.getVmm(), new CloudletSchedulerTimeShared());
 		    
 		    /** Test 0utput to be deleted later **/
-		    System.out.println("VM ID: " + vm.getId());
-		    System.out.println("VM Model ID: " + vm.getVmModelId());
-            System.out.println("MIPS: " + vm.getMips());
-            System.out.println("RAM: " + vm.getRam());
-            System.out.println("Storage Size: " + vm.getSize());
-            System.out.println("Bandwidth: " + vm.getBw());
-            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
-            System.out.println("VMM: " + vm.getVmm());
-            System.out.println();
+//		    System.out.println("VM ID: " + vm.getId());
+//		    System.out.println("VM Model ID: " + vm.getVmModelId());
+//            System.out.println("MIPS: " + vm.getMips());
+//            System.out.println("RAM: " + vm.getRam());
+//            System.out.println("Storage Size: " + vm.getSize());
+//            System.out.println("Bandwidth: " + vm.getBw());
+//            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
+//            System.out.println("VMM: " + vm.getVmm());
+//            System.out.println();
 		    
 			// Add each VM to the VMlist
 			vmlist.add(vm);
@@ -210,8 +210,8 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 	        model.getCostPerStorage(), model.getCostPerBw());
 		
 		// Assigns timezone to datacenter
-		System.out.println("CREATING TIME_ZONE:");
-		System.out.println(model.getTime_zone());
+//		System.out.println("CREATING TIME_ZONE:");
+		model.getTime_zone();
 		
 		LinkedList<Storage> storageList = new LinkedList<Storage>();	
 
@@ -227,6 +227,20 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		}
 		
 		return datacenter;
+	}
+	
+	public double calculatePopulationFitness(double minCost, double maxCost, int minLatency, int maxLatency) {
+		
+		double populationFitness = 0;
+		
+		for (int i = 0; i < this.chromosomes.size(); i++) {
+			
+			populationFitness += this.chromosomes.get(i).calculateChromosomeFitness(minCost, maxCost, minLatency, maxLatency);
+			
+		}
+		
+		populationFitness /= this.chromosomes.size();
+		return populationFitness;
 	}
 }
 
