@@ -2,6 +2,7 @@ package org.cloudbus.cloudsim;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 // Chromosome class represents one whole solution, where all vms are allocated to hosts.
 public class Chromosome {
@@ -181,26 +182,19 @@ public class Chromosome {
 
 
 	//Iterate through all VMS to allocate to hosts randomly
-	public void allocateAllVmsRandomly(Chromosome chromosome, List<Datacenter> datacenters, List<Vm> vmlist) {
-		
-		// Iterates through until the vms are all allocated or there are not enough hosts
-	    for (int i = 0; i < vmlist.size() && i<datacenters.size(); i++) {
-	    	
-	 	Vm vm = vmlist.get(i);
-	        Datacenter datacenter = datacenters.get(i);
-	        
-	        // Calculate the cost of assigning the current VM to the current datacenter
-	        double vmCost = getCostOfSingleVM(datacenter, vm);
-	        
-	        // Calculate the latency of assigning the current VM to the current datacenter
-	        double vmLatency= calculateLatencyCost(datacenter, vm);
-	        
-	        // Save allocation details
-	        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
-	        
-	        chromosome.addAllocation(allocation);     
-	    }
-	}
+	 public void allocateVmsRandomly(int numberOfAllocations, List<Datacenter> datacenters, List<Vm> vmlist) {
+		    Random rand = new Random();
+		    for (int i = 0; i < numberOfAllocations; i++) {
+		        Vm vm = vmlist.get(rand.nextInt(vmlist.size())); // Select random VM
+		        Datacenter datacenter = datacenters.get(rand.nextInt(datacenters.size())); // Select random Datacenter
+		        
+		        double vmCost = getCostOfSingleVM(datacenter, vm);
+		        double vmLatency = calculateLatencyCost(datacenter, vm);
+		        
+		        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
+		        addAllocation(allocation);
+		    }
+		}
 	
 	// Currently, obtains cost for vms that are allocated sequentially to available hosts or data centers
 	public double getTotalCostOfAllVMs(List<Datacenter> datacenters, List<Vm> vmlist) {
@@ -263,4 +257,9 @@ public double calculateFitness (double minCost, double maxCost, int minLatency, 
 	 return fitness;
 	 
  }
+
+public void clearAllocations() {
+	this.allocations.clear();
+	
+}
 }

@@ -61,6 +61,9 @@ public class CloudSimAlgorithm {
 
 			// I'll define how many data centers are created iteratively
 			int numberOfDataCenters = 5;
+			
+			// This can specify how many genes a chromosome can have (or how many different vm - model pairings.
+			int numberOfAllocationsPerChromosome = 20;
 
 			List<Datacenter> datacenters = new ArrayList<>();
 
@@ -119,39 +122,56 @@ public class CloudSimAlgorithm {
 			int numberOfVms = 5;
 
 			// Population instantiation
-			int populationSize = 5;
+			int populationSize = 10;
 			Population population1 = new Population(populationSize);
 			
 
-			population1.initializePopulation(numberOfVms, brokerId, numberOfDataCenters, datacenters, vmlist,
+			population1.initializePopulation(numberOfAllocationsPerChromosome, numberOfVms, brokerId, numberOfDataCenters, datacenters, vmlist,
 					datacenterModels, vmModels);
 			
 			
 			/** TESTING OUT SELECTION **/
 			
-//			 // Print the initial population and their fitness
-//	        System.out.println("Initial population:");
-//	        for (Chromosome chromosome : population1.getChromosomes()) {
-//	            System.out.println("Chromosome fitness: " + chromosome.getFitness());
-//	        }
-//
-//	        // Test tournament selection
-//	        System.out.println("\nSelected parents:");
-//	        
-//	        for (int i = 0; i < 5; i++) { // Select 5 pairs of parents
-//	            Chromosome parent1 = population1.tournamentSelection();
-//	            Chromosome parent2 = population1.tournamentSelection();
-//
-//	            // Ensure parent1 and parent2 are not the same
-//	            while (parent1 == parent2) {
-//	                parent2 = population1.tournamentSelection();
-//	            }
-//
-//	            System.out.println("Parent 1 fitness: " + parent1.getFitness());
-//	            System.out.println("Parent 2 fitness: " + parent2.getFitness());
-//	            System.out.println("---");
-//	        }
+			 // Print the initial population and their fitness
+	        System.out.println("Initial population:");
+	        for (Chromosome chromosome : population1.getChromosomes()) {
+	            System.out.println("Chromosome fitness: " + chromosome.getFitness());
+	        }
 
+	        // Test tournament selection
+	        System.out.println("\nSelected parents:");
+	        System.out.println("Tournament Selection Results:");
+	        
+//	        for (int i = 0; i < 5; i++) { // Select 5 pairs of parents
+	        
+	        	
+	            Chromosome parent1 = population1.tournamentSelection();
+	            Chromosome parent2 = population1.tournamentSelection();
+
+	            // Ensure parent1 and parent2 are not the same
+	            while (parent1 == parent2) {
+	                parent2 = population1.tournamentSelection();
+	            }
+
+	            System.out.println("Parent 1 fitness: " + parent1.getFitness());
+	            System.out.println("Parent 2 fitness: " + parent2.getFitness());
+	            System.out.println("---");
+	            
+	            Chromosome offspring = population1.crossover(parent1, parent2);
+//	            
+//	            System.out.println(" ");
+//	            // Print offspring details
+//	            System.out.println("Offspring fitness: " + offspring.getFitness());
+//	            System.out.println("Offspring Allocations:");
+//	            System.out.println(offspring.getAllocations());
+//	        }
+	     
+
+	
+	        
+	          
+	           
+			
 			/** Testing populations **/
 			System.out.println(" ");
 			System.out.println("****TESTING POPULATIONS****");
@@ -285,7 +305,7 @@ public class CloudSimAlgorithm {
 
 		String indent = "    ";
 		Log.printLine();
-		Log.printLine("========== OUTPUT ==========");
+		Log.printLine("========== OUTPUT ==========");)
 		Log.printLine("Cloudlet ID" + indent + "STATUS" + indent + "Data center ID" + indent + "VM ID" + indent + "Time"
 				+ indent + "Start Time" + indent + "Finish Time");
 
