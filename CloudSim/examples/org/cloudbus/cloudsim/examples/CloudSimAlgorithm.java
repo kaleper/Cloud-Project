@@ -13,6 +13,7 @@ import org.cloudbus.cloudsim.Allocation;
 import org.cloudbus.cloudsim.Chromosome;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
+import org.cloudbus.cloudsim.Config;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
@@ -60,10 +61,10 @@ public class CloudSimAlgorithm {
 			// Second step: Create Datacenters with random data center models.
 
 			// I'll define how many data centers are created iteratively
-			int numberOfDataCenters = 5;
+			int numberOfDataCenters = Config.numberOfDataCenters;
 			
 			// This can specify how many genes a chromosome can have (or how many different vm - model pairings.
-			int numberOfAllocationsPerChromosome = 20;
+			int numberOfAllocationsPerChromosome = Config.numberOfAllocationsPerChromosome;
 
 			List<Datacenter> datacenters = new ArrayList<>();
 
@@ -118,11 +119,11 @@ public class CloudSimAlgorithm {
 			// Will hold all Vm instances with a model associated to it
 			List<Vm> vmlist = new ArrayList<Vm>();
 
-			// Use to define how many VMs will be used
-			int numberOfVms = 5;
+			// Use to define how many VM models will be used
+			int numberOfVms = Config.numberOfVms;
 
 			// Population instantiation
-			int populationSize = 10;
+			int populationSize = Config.populationSize;
 			Population population1 = new Population(populationSize);
 			
 
@@ -176,9 +177,9 @@ public class CloudSimAlgorithm {
 	            
 			
 			/** Testing populations **/
-			System.out.println(" ");
-			System.out.println("****TESTING POPULATIONS****");
-			System.out.println(" ");
+//			System.out.println(" ");
+//			System.out.println("****TESTING POPULATIONS****");
+//			System.out.println(" ");
 //			 // Print out or manipulate the chromosomes as needed
 //	        for (int i = 0; i < population1.getChromosomes().size(); i++) {
 //	            Chromosome currentChromosome = population1.getChromosomes().get(i);
@@ -188,10 +189,10 @@ public class CloudSimAlgorithm {
 //	            System.out.println("Chromosome " + i + " fitness: ");
 //	            System.out.println(currentChromosome.calculateChromosomeFitness(7.22, 42.6119, 1, 255));
 //	            System.out.println("-----------------------");
-//	        }
-			System.out.println("Population fitness:");
-			System.out.println(population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
-			System.out.println(" ");
+////	        }
+//			System.out.println("Population fitness:");
+//			System.out.println(population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
+//			System.out.println(" ");
 
 			// submit vm list to the broker
 			broker.submitVmList(vmlist);

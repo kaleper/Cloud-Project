@@ -25,8 +25,8 @@ public class Population {
 	private int minLatency = 1;
 	private int maxLatency = 255;
 	
-	// 4% chance of mutating an offspring - can change value if i want.
-	private static double mutationChance = 0.04;
+	// Specified chance of mutating defined in config file
+	private static double mutationChance = Config.mutationChance;
 
 
 	public Population(int populationSize) {
