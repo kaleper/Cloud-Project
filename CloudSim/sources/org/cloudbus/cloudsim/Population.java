@@ -24,6 +24,9 @@ public class Population {
 	private double maxCost = 42.6119;
 	private int minLatency = 1;
 	private int maxLatency = 255;
+	
+	// 4% chance of mutating an offspring - can change value if i want.
+	private static double mutationChance = 0.04;
 
 
 	public Population(int populationSize) {
@@ -319,9 +322,83 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 	    // Calculate fitness for the new offspring
         double offspringFitness = offspring.calculateChromosomeFitness(minCost, maxCost, minLatency, maxLatency);
         offspring.setFitness(offspringFitness);
-	    
+	   
+        
 	    // Return the new chromosome (offspring)
 	    return offspring;
+	}
+	// Mutates an offspring based on chance
+	public Chromosome mutate(Chromosome offspring, List<Datacenter> datacenters, List <Vm> vmlist) {
+		if (Math.random() < mutationChance) {
+			
+			
+			System.out.println("Mutation occured when creating offspring - " + ((int)( mutationChance * 100)) + "% of occuring!");
+			
+			// Mutate using swap mutate, which swaps 2 random indices (or allocations)
+			
+			 // Get all of the current offspring Allocations
+			 List<Allocation> offspringAllocations = offspring.getAllocations();
+			
+			 // Get a random allocation index from the offspring
+			 int allocationIndex =  (int) (Math.random() * offspring.getAllocations().size());
+			 
+			 Allocation oldAllocation = offspringAllocations.get(allocationIndex);
+			
+			 
+			 // Output to show the mutation:
+			 		System.out.println("---------");
+					System.out.println("Old Allocation:");
+			        System.out.println("Allocation ID: " + oldAllocation.getAllocationId());
+			        System.out.println("VM ID: " + oldAllocation.getVmId());
+			        System.out.println("Data Center ID: " + oldAllocation.getDatacenterId());
+			        System.out.println("Cost: $" + String.format("%.2f", oldAllocation.getCost()));
+			        System.out.println("Latency: " + String.format("%.2f", oldAllocation.getLatency()) + " ms");
+			        
+			 
+	        // Get a new random datacenter ID different from the current one
+	        int randomDatacenterID;
+	        // Do while prevents the same one from being picked again
+	        do {
+	            randomDatacenterID = (int) (Math.random() * datacenters.size());
+	        } while (randomDatacenterID == oldAllocation.getDatacenterId());
+		 	
+		 	
+		 	int currentVmID = oldAllocation.getVmId();
+		 	Vm currentVM = vmlist.get(currentVmID);
+		 	
+		 	Datacenter newDataCenter = datacenters.get(randomDatacenterID);
+
+	        // Calculate the cost and latency for the new datacenter
+		 	double newCost = offspring.calculateLatencyCost(newDataCenter, currentVM);
+		 	double newLatency = offspring.getCostOfSingleVM(newDataCenter, currentVM);
+	    
+
+	        // Create a new allocation with the new datacenter ID
+	        Allocation newAllocation = new Allocation(
+	            oldAllocation.getAllocationId(), 
+	            oldAllocation.getVmId(), 
+	            randomDatacenterID,
+	            newCost, 
+	            newLatency
+	        );
+
+	        // Replace the old allocation with the new one
+	        offspringAllocations.set(allocationIndex, newAllocation);
+	        
+	        // Output to show the mutation:
+			        System.out.println("New Allocation:");
+			        System.out.println("Allocation ID: " + newAllocation.getAllocationId());
+			        System.out.println("VM ID: " + newAllocation.getVmId());
+			        System.out.println("Data Center ID: " + newAllocation.getDatacenterId());
+			        System.out.println("Cost: $" + String.format("%.2f", newAllocation.getCost()));
+			        System.out.println("Latency: " + String.format("%.2f", newAllocation.getLatency()) + " ms");
+	       
+			        System.out.println("---------");
+	    
+
+
+		}
+		return offspring;
 	}
 }
 

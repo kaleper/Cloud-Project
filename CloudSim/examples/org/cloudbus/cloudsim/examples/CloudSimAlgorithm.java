@@ -165,12 +165,15 @@ public class CloudSimAlgorithm {
 	            System.out.println("Offspring Allocations:");
 	            System.out.println(offspring.getAllocations());
 //	        }
-	     
-
-	
-	        
-	          
-	           
+	            System.out.println(" ");
+	            System.out.println("---");
+	            System.out.println("Mutation: ");
+	            System.out.println(" ");
+	            
+	            // Give chance for mutation to occur (mutation chance specified in population class)
+	            population1.mutate(offspring, datacenters, vmlist);
+	            offspring.printAllAllocations();
+	            
 			
 			/** Testing populations **/
 			System.out.println(" ");
