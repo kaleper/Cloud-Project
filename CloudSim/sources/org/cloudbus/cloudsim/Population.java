@@ -293,68 +293,35 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		}
 	}
 	
+	// Creates an offspring by crossing two fit parents over
 	public Chromosome crossover(Chromosome parent1, Chromosome parent2) {
 		
-		 // New offspring created 
-		 Chromosome offspring = new Chromosome();
-		 
-		 // Gets the chromosome 'genes' or allocations
-		 List<Allocation> parent1Allocations = parent1.getAllocations();
-	     List<Allocation> parent2Allocations = parent2.getAllocations();
-	     
-	     // Test print allocations
-	     System.out.println(" ");
-	     System.out.println("Parent 1 allocations:");
-	     System.out.println(parent1Allocations);
-	     System.out.println(" ");
-	     System.out.println("Parent 2 allocations:");
-	     System.out.println(parent2Allocations);
-	     
-	     int crossoverPoint = (int) (Math.random() * parent1Allocations.size()); // Random crossover point
-
-	     
-	     System.out.println("Crossover point:" + crossoverPoint);
-
-	     // Sets to track used VM and Datacenter IDs. Hashsets useful to prevent any dupes
-	     Set<Integer> usedVMs = new HashSet<>();
-	     Set<Integer> usedDatacenters = new HashSet<>();
-
-	     // Add allocations from parent1 up to the crossover point
-	     for (int i = 0; i < crossoverPoint; i++) {
-	         Allocation allocation = parent1Allocations.get(i);
-	         
-	         // Checks to make sure that the VM id and the data center ID aren't already being used 
-	         if (!usedVMs.contains(allocation.getVmId()) && !usedDatacenters.contains(allocation.getDatacenterId())) {
-	        	 // Add the gene to the offspring if not
-	             offspring.addAllocation(allocation);
-	             
-	             // Marks both the VM and the data center as used now
-	             usedVMs.add(allocation.getVmId());
-	             usedDatacenters.add(allocation.getDatacenterId());
-	         }
-	     }
-
-	     // Add allocations from parent2 after the crossover point
-	     for (int i = crossoverPoint; i < parent2Allocations.size(); i++) {
-	         Allocation allocation = parent2Allocations.get(i);
-	         // Check to make sure that the VMs and the datacenters aren't already being used.
-	         
-	         if (!usedVMs.contains(allocation.getVmId()) && !usedDatacenters.contains(allocation.getDatacenterId())) {
-	        	 // Add the gene to new offspring if not
-	             offspring.addAllocation(allocation);
-	             usedVMs.add(allocation.getVmId());
-	             usedDatacenters.add(allocation.getDatacenterId());
-	         }
-	     }
-	     System.out.println(" ");
-	     System.out.println(" ");
-	     System.out.println("Offspring allocations:");
-	     System.out.println(offspring.getAllocations());
-
-	     return offspring;
-	   
+	    // Create a new chromosome for the offspring
+	    Chromosome offspring = new Chromosome();
+	    
+	    // Get the allocations (genes) from both parents
+	    List<Allocation> parent1Allocations = parent1.getAllocations();
+	    List<Allocation> parent2Allocations = parent2.getAllocations();
+	    
+	    // Determine a random crossover point
+	    int crossoverPoint = (int) (Math.random() * parent1Allocations.size());
+	    
+	    // Add allocations from parent1 up to the crossover point
+	    for (int i = 0; i < crossoverPoint; i++) {
+	        offspring.addAllocation(parent1Allocations.get(i));
+	    }
+	    
+	    // Add allocations from parent2 after the crossover point
+	    for (int i = crossoverPoint; i < parent2Allocations.size(); i++) {
+	        offspring.addAllocation(parent2Allocations.get(i));
+	    }
+	    
+	    // Calculate fitness for the new offspring
+        double offspringFitness = offspring.calculateChromosomeFitness(minCost, maxCost, minLatency, maxLatency);
+        offspring.setFitness(offspringFitness);
+	    
+	    // Return the new chromosome (offspring)
+	    return offspring;
 	}
-
-	
 }
 

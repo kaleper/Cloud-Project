@@ -244,7 +244,7 @@ public double calculateFitness (double minCost, double maxCost, int minLatency, 
 	    	// Latency weighted less
 	        double latencyWeight = 0.4; 
 	        
-	     // Reversed normalization to get a cost or latency between 0-1, with closer to 1 being better
+	    	// Reversed normalization to get a cost or latency between 0-1, with closer to 1 being better
 	        double normalizedCost = (maxCost - this.getAllocation(i).getCost()) / (maxCost - minCost);
 	        double normalizedLatency = (maxLatency - this.getAllocation(i).getLatency()) / (maxLatency - minLatency);
 	        // Keeps running total of fitness

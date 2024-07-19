@@ -158,12 +158,12 @@ public class CloudSimAlgorithm {
 	            System.out.println("---");
 	            
 	            Chromosome offspring = population1.crossover(parent1, parent2);
-//	            
-//	            System.out.println(" ");
-//	            // Print offspring details
-//	            System.out.println("Offspring fitness: " + offspring.getFitness());
-//	            System.out.println("Offspring Allocations:");
-//	            System.out.println(offspring.getAllocations());
+	            
+	            System.out.println(" ");
+	            // Print offspring details
+	            System.out.println("Offspring fitness: " + offspring.getFitness());
+	            System.out.println("Offspring Allocations:");
+	            System.out.println(offspring.getAllocations());
 //	        }
 	     
 
