@@ -130,50 +130,57 @@ public class CloudSimAlgorithm {
 			population1.initializePopulation(numberOfAllocationsPerChromosome, numberOfVms, brokerId, numberOfDataCenters, datacenters, vmlist,
 					datacenterModels, vmModels);
 			
+			System.out.println("Initial Population Fitness:" + population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
 			
-			/** TESTING OUT SELECTION **/
+			for (int i = 0; i < Config.numberOfGenerations; i++) {
+				System.out.println("-----------------------");
+	            System.out.println("Generation " + i);
+	            System.out.println(" ");
+				population1.doGeneration(population1, datacenters, vmlist);
+				System.out.println("Generation " + i + ", population fitness: " + population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
+				
+			}
 			
-			 // Print the initial population and their fitness
-	        System.out.println("Initial population:");
-	        for (Chromosome chromosome : population1.getChromosomes()) {
-	            System.out.println("Chromosome fitness: " + chromosome.getFitness());
-	        }
-
-	        // Test tournament selection
-	        System.out.println("\nSelected parents:");
-	        System.out.println("Tournament Selection Results:");
-	        
-//	        for (int i = 0; i < 5; i++) { // Select 5 pairs of parents
-	        
-	        	
-	            Chromosome parent1 = population1.tournamentSelection();
-	            Chromosome parent2 = population1.tournamentSelection();
-
-	            // Ensure parent1 and parent2 are not the same
-	            while (parent1 == parent2) {
-	                parent2 = population1.tournamentSelection();
-	            }
-
-	            System.out.println("Parent 1 fitness: " + parent1.getFitness());
-	            System.out.println("Parent 2 fitness: " + parent2.getFitness());
-	            System.out.println("---");
-	            
-	            Chromosome offspring = population1.crossover(parent1, parent2);
-	            
-	            System.out.println(" ");
-	            // Print offspring details
-	            System.out.println("Offspring fitness: " + offspring.getFitness());
-	            System.out.println("Offspring Allocations:");
-	            System.out.println(offspring.getAllocations());
-//	        }
-	            System.out.println(" ");
-	            System.out.println("---");
-	            System.out.println("Mutation: ");
-	            System.out.println(" ");
-	            
-	            // Give chance for mutation to occur (mutation chance specified in population class)
-	            population1.mutate(offspring, datacenters, vmlist);
-	            offspring.printAllAllocations();
+			
+//			population1.getChromosomes().get(1).getAllocations();
+			
+			
+////
+//	        // Test tournament selection
+//	        System.out.println("\nSelected parents:");
+//	        System.out.println("Tournament Selection Results:");
+//	        
+////	        for (int i = 0; i < 5; i++) { // Select 5 pairs of parents
+//	        
+//	        	
+//	            Chromosome parent1 = population1.tournamentSelection();
+//	            Chromosome parent2 = population1.tournamentSelection();
+//
+//	            // Ensure parent1 and parent2 are not the same
+//	            while (parent1 == parent2) {
+//	                parent2 = population1.tournamentSelection();
+//	            }
+//
+//	            System.out.println("Parent 1 fitness: " + parent1.getFitness());
+//	            System.out.println("Parent 2 fitness: " + parent2.getFitness());
+//	            System.out.println("---");
+//	            
+//	            Chromosome offspring = population1.crossover(parent1, parent2);
+//	            
+//	            System.out.println(" ");
+//	            // Print offspring details
+//	            System.out.println("Offspring fitness: " + offspring.getFitness());
+//	            System.out.println("Offspring Allocations:");
+//	            System.out.println(offspring.getAllocations());
+////	        }
+//	            System.out.println(" ");
+//	            System.out.println("---");
+//	            System.out.println("Mutation: ");
+//	            System.out.println(" ");
+//	            
+//	            // Give chance for mutation to occur (mutation chance specified in population class)
+//	            population1.mutate(offspring, datacenters, vmlist);
+//	            offspring.printAllAllocations();
 	            
 			
 			/** Testing populations **/

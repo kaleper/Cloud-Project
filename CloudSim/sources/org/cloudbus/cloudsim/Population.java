@@ -38,9 +38,6 @@ public class Population {
 	// Initialize population with random chromosomes
 	public void initializePopulation(int numberOfAllocationsPerChromosome, int numberOfVms, int brokerId, int numberOfDataCenters, List<Datacenter> datacenters, List<Vm> vmlist, List<DatacenterModel> datacenterModels, List<VMModel> vmModels) {
 		
-	
-		
-	    
 	    for (int i = 0; i < populationSize; i++) {
 	    	
 	        Chromosome chromosome = new Chromosome();
@@ -251,14 +248,16 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 	}
 	
 	
-	public void doGeneration() {
+	public void doGeneration(Population population, List<Datacenter> datacenters, List <Vm> vmlist) {
 		
+		
+		// Holds new generation
 		List<Chromosome> newGeneration = new ArrayList<>();
 		
-		// Generate new offspring until it has the same population size
-		for (int i = 0; i < populationSize; i++) {
+		// Generate new offspring for new gen until it has the same population size
+		while (newGeneration.size() < populationSize) {
 			
-			// Get parents 
+			// Select fit parents
 			Chromosome mother = tournamentSelection();
 			Chromosome father = tournamentSelection();
 			
@@ -267,9 +266,21 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 				father = tournamentSelection();
 			}
 			
-			// Do the crossover
+			
+//			System.out.println("Parent 1 fitness: " + mother.getFitness());
+//            System.out.println("Parent 2 fitness: " + father.getFitness());
+			// Crosses parents over 
+			Chromosome offspring = population.crossover(mother, father);
+			// Mutates the offspring based on chance specified in config
+			population.mutate(offspring, datacenters, vmlist);
+			// Add the new offspring to the generation
+			newGeneration.add(offspring);	
+//			System.out.println("Offspring fitness: " + offspring.getFitness());
+//            System.out.println("Offspring Allocations:");
+//            System.out.println(offspring.getAllocations());
 		}
-	
+		// Updates the population with the new generation
+			population.setChromosomes(newGeneration);
 	}
 	
 	// Selecting parents part of MOGA
@@ -346,13 +357,13 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 			
 			 
 			 // Output to show the mutation:
-			 		System.out.println("---------");
-					System.out.println("Old Allocation:");
-			        System.out.println("Allocation ID: " + oldAllocation.getAllocationId());
-			        System.out.println("VM ID: " + oldAllocation.getVmId());
-			        System.out.println("Data Center ID: " + oldAllocation.getDatacenterId());
-			        System.out.println("Cost: $" + String.format("%.2f", oldAllocation.getCost()));
-			        System.out.println("Latency: " + String.format("%.2f", oldAllocation.getLatency()) + " ms");
+//			 		System.out.println("---------");
+//					System.out.println("Old Allocation:");
+//			        System.out.println("Allocation ID: " + oldAllocation.getAllocationId());
+//			        System.out.println("VM ID: " + oldAllocation.getVmId());
+//			        System.out.println("Data Center ID: " + oldAllocation.getDatacenterId());
+//			        System.out.println("Cost: $" + String.format("%.2f", oldAllocation.getCost()));
+//			        System.out.println("Latency: " + String.format("%.2f", oldAllocation.getLatency()) + " ms");
 			        
 			 
 	        // Get a new random datacenter ID different from the current one
@@ -386,14 +397,14 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 	        offspringAllocations.set(allocationIndex, newAllocation);
 	        
 	        // Output to show the mutation:
-			        System.out.println("New Allocation:");
-			        System.out.println("Allocation ID: " + newAllocation.getAllocationId());
-			        System.out.println("VM ID: " + newAllocation.getVmId());
-			        System.out.println("Data Center ID: " + newAllocation.getDatacenterId());
-			        System.out.println("Cost: $" + String.format("%.2f", newAllocation.getCost()));
-			        System.out.println("Latency: " + String.format("%.2f", newAllocation.getLatency()) + " ms");
-	       
-			        System.out.println("---------");
+//			        System.out.println("New Allocation:");
+//			        System.out.println("Allocation ID: " + newAllocation.getAllocationId());
+//			        System.out.println("VM ID: " + newAllocation.getVmId());
+//			        System.out.println("Data Center ID: " + newAllocation.getDatacenterId());
+//			        System.out.println("Cost: $" + String.format("%.2f", newAllocation.getCost()));
+//			        System.out.println("Latency: " + String.format("%.2f", newAllocation.getLatency()) + " ms");
+//	       
+//			        System.out.println("---------");
 	    
 
 
