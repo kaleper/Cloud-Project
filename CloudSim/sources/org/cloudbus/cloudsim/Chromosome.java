@@ -17,6 +17,8 @@ public class Chromosome {
         this.allocations = new ArrayList<>();
         //fitness is 0 initially
         this.fitness= 0.0;
+        this.totalLatency= 0.0;
+        this.totalCost = 0.0;
    
     }
 
@@ -46,7 +48,7 @@ public class Chromosome {
     }
 
 	public double getTotalCost() {
-		return totalCost;
+		return this.totalCost;
 	}
 
 	public void setTotalCost(double totalCost) {
@@ -193,7 +195,17 @@ public class Chromosome {
 		        
 		        Allocation allocation = new Allocation(i, vm.getId(), datacenter.getId(), vmCost, vmLatency);
 		        addAllocation(allocation);
+		        
+		        // Update total cost and latency
+		        totalCost += vmCost;
+//		        System.out.println("Total cost is:" + totalCost);
+//		        System.out.println("Current totalCost in allocateVmsRandomly: " + totalCost);
+		        totalLatency += vmLatency;
+//		        System.out.println("Total latency is:" + totalLatency);
 		    }
+		 // Set the total cost and latency for the chromosome
+		    setTotalCost(totalCost);
+		    setTotalLatency(totalLatency);
 		}
 	
 	// Currently, obtains cost for vms that are allocated sequentially to available hosts or data centers

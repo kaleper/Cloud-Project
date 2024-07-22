@@ -25,6 +25,7 @@ public class Population {
 	private int minLatency = 1;
 	private int maxLatency = 255;
 	
+	
 	// Specified chance of mutating defined in config file
 	private static double mutationChance = Config.mutationChance;
 
@@ -33,6 +34,7 @@ public class Population {
 		
 	    this.populationSize = populationSize;
 	    this.chromosomes= new ArrayList();
+
 	}
 	
 	// Initialize population with random chromosomes
@@ -79,30 +81,18 @@ public class Population {
 	        //Allocate chromosomes randomly.
         	chromosome.allocateVmsRandomly(numberOfAllocationsPerChromosome, datacenters, vmlist);
         	
+//        	System.out.println("Total cost of chromosomes:" + chromosome.getTotalCost());
+        	
         	// Calculate fitness for the chromosome
             double chromosomeFitness = chromosome.calculateChromosomeFitness(minCost, maxCost, minLatency, maxLatency);
+           
             chromosome.setFitness(chromosomeFitness);
 	        
 	        chromosomes.add(chromosome);
+	     
 	    }
 	}
 
-	public List<Chromosome> getChromosomes() {
-		return chromosomes;
-	}
-
-	public void setChromosomes(List<Chromosome> chromosomes) {
-		this.chromosomes = chromosomes;
-	}
-
-	public int getPopulationSize() {
-		return populationSize;
-	}
-
-	public void setPopulationSize(int populationSize) {
-		this.populationSize = populationSize;
-	}
-	
 public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterModel> datacenterModels, List <Datacenter> datacenters) {
 		
 		/* Loop to create however many data centers I specify.
@@ -247,40 +237,75 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		return populationFitness;
 	}
 	
+//	// Verified works but need to debug why it won't print after generations?
+//	public double calculatePopulationCost() {
+//	    double totalCost = 0;
+//
+//	    
+//        for (Chromosome chromosome : chromosomes) {
+//            totalCost += chromosome.getTotalCost();
+//           
+//        }
+//	     
+//	   
+//	    return totalCost;
+//    }
 	
-	public void doGeneration(Population population, List<Datacenter> datacenters, List <Vm> vmlist) {
+
+//	// Verified works but need to debug why it won't print after generations?
+//	public double calculatePopulationLatency(List<Datacenter> datacenters, List<Vm> vmlist) {
+//	    double totalLatency = 0;
+//
+//        for (Chromosome chromosome : this.chromosomes) {
+//        	
+//        	for (int i = 0; i <chromosome.getAllocations().size(); i++) {
+//        		Datacenter datacenter = datacenters.get(chromosome.getAllocation(i).getDatacenterId());
+//        		Vm vm = vmlist.get(chromosome.getAllocation(i).getVmId());
+//        		
+////        		double vmCost = chromosome.getCostOfSingleVM(datacenter, vm);
+//        		double vmLatency = chromosome.calculateLatencyCost(datacenter, vm);
+//        		 totalLatency += chromosome.getTotalLatency();
+//        		 System.out.println(totalLatency);
+//        	}
+//           
+//        }
+//	     
+//	    
+//	    return totalLatency;
+//    }
+//	
+	
+	public void doGeneration(Population population, List<Datacenter> datacenters, List<Vm> vmlist) {
+	   
+
+			// Holds new generation
+		    List<Chromosome> newGeneration = new ArrayList<>();
+		    
+		    // Generate new offspring for new gen until it has the same population size
+		    while (newGeneration.size() < populationSize) {
+		        // Select fit parents
+		        Chromosome mother = tournamentSelection();
+		        Chromosome father = tournamentSelection();
+		        
+		        // Make sure mother and father are not the same to prevent identicalness
+		        while (mother == father) {
+		            father = tournamentSelection();
+		        }
+		        
+		        // Crosses parents over 
+		        Chromosome offspring = population.crossover(mother, father);
+		        // Mutates the offspring based on chance specified in config
+		        population.mutate(offspring, datacenters, vmlist);
+		        // Add the new offspring to the generation
+		        newGeneration.add(offspring);    
+		    }	
+		    
+		   
+		    // Update the population with the new generation
+		    population.setChromosomes(newGeneration);
+		    
 		
-		
-		// Holds new generation
-		List<Chromosome> newGeneration = new ArrayList<>();
-		
-		// Generate new offspring for new gen until it has the same population size
-		while (newGeneration.size() < populationSize) {
-			
-			// Select fit parents
-			Chromosome mother = tournamentSelection();
-			Chromosome father = tournamentSelection();
-			
-			// Make sure mother and father are not the same to prevent identicalness
-			while (mother == father) {
-				father = tournamentSelection();
-			}
-			
-			
-//			System.out.println("Parent 1 fitness: " + mother.getFitness());
-//            System.out.println("Parent 2 fitness: " + father.getFitness());
-			// Crosses parents over 
-			Chromosome offspring = population.crossover(mother, father);
-			// Mutates the offspring based on chance specified in config
-			population.mutate(offspring, datacenters, vmlist);
-			// Add the new offspring to the generation
-			newGeneration.add(offspring);	
-//			System.out.println("Offspring fitness: " + offspring.getFitness());
-//            System.out.println("Offspring Allocations:");
-//            System.out.println(offspring.getAllocations());
-		}
-		// Updates the population with the new generation
-			population.setChromosomes(newGeneration);
+
 	}
 	
 	// Selecting parents part of MOGA
@@ -343,7 +368,7 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		if (Math.random() < mutationChance) {
 			
 			
-			System.out.println("Mutation occured when creating offspring - " + ((int)( mutationChance * 100)) + "% of occuring!");
+//			System.out.println("Mutation occured when creating offspring - " + ((int)( mutationChance * 100)) + "% of occuring!");
 			
 			// Mutate using swap mutate, which swaps 2 random indices (or allocations)
 			
@@ -411,5 +436,24 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		}
 		return offspring;
 	}
+	
+	public List<Chromosome> getChromosomes() {
+		return chromosomes;
+	}
+
+	public void setChromosomes(List<Chromosome> chromosomes) {
+		this.chromosomes = chromosomes;
+	
+	}
+	
+	
+	public int getPopulationSize() {
+		return populationSize;
+	}
+
+	public void setPopulationSize(int populationSize) {
+		this.populationSize = populationSize;
+	}
+	
 }
 

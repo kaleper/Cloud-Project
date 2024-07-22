@@ -5,13 +5,13 @@ public class Config{
 	//For GA
 	
 		public static int numberOfGenerations = 50;
-		public static int populationSize = 10;
+		public static int populationSize = 50;
 		
 		// Use to define how many VM models will be used
 		public static int numberOfVms = 5;
 	
 		// 4% chance of mutating an offspring - can change value if i want.
-		public static double mutationChance = 0.04;
+		public static double mutationChance = 0.30;
 		
 	
 	

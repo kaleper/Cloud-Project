@@ -46,7 +46,7 @@ public class CloudSimAlgorithm {
 	/* Program runs off main method */
 	public static void main(String[] args) {
 
-		Log.printLine("Starting CloudSimAlgorithm...");
+//		Log.printLine("Starting CloudSimAlgorithm...");
 
 		try {
 
@@ -62,6 +62,9 @@ public class CloudSimAlgorithm {
 
 			// I'll define how many data centers are created iteratively
 			int numberOfDataCenters = Config.numberOfDataCenters;
+			
+			// I'll define how many generations to run through
+			int numberOfGenerations= Config.numberOfGenerations;
 			
 			// This can specify how many genes a chromosome can have (or how many different vm - model pairings.
 			int numberOfAllocationsPerChromosome = Config.numberOfAllocationsPerChromosome;
@@ -129,21 +132,66 @@ public class CloudSimAlgorithm {
 
 			population1.initializePopulation(numberOfAllocationsPerChromosome, numberOfVms, brokerId, numberOfDataCenters, datacenters, vmlist,
 					datacenterModels, vmModels);
+//			System.out.println("Initial Population Cost:" + population1.calculatePopulationCost());
+//			System.out.println("Initial Population Latency:" + population1.calculatePopulationLatency(datacenters, vmlist));
+//			
 			
-			System.out.println("Initial Population Fitness:" + population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
+			// Initial population fitness
+			System.out.println(0 + " " + population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
+//			System.out.println("Initial Population Fitness:" + population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
 			
-			for (int i = 0; i < Config.numberOfGenerations; i++) {
-				System.out.println("-----------------------");
-	            System.out.println("Generation " + i);
-	            System.out.println(" ");
-				population1.doGeneration(population1, datacenters, vmlist);
-				System.out.println("Generation " + i + ", population fitness: " + population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
+//			
+//				System.out.println("-----------------------");
+	//	            System.out.println(" ");
+				for (int i = 1; i < numberOfGenerations + 1; i++) {
+				    population1.doGeneration(population1, datacenters, vmlist);
+	
+				    // Print the population fitness for the current generation
+//				    System.out.println(i + " " + population1.calculatePopulationFitness(7.22, 42.6119, 1, 255));
+				    
+				    // Save cost & latency for population
+				    double totalCostPopulation = 0.0;
+				    double totalLatencyPopulation = 0.0;
+	
+				    for (int j = 0; j < population1.getChromosomes().size() - 1; j++) {
+					    // Get the current chromosome from the population
+					    Chromosome currentChromosome = population1.getChromosomes().get(j);
+		
+					    // Initialize the total cost for the current chromosome
+					    double totalCostChromosome = 0.0;
+					    
+					    double totalLatencyChromosome = 0.0;
+		
+					    // Iterate over the allocations of the current chromosome
+					    for (Allocation allocation : currentChromosome.getAllocations()) {
+					        // Add the cost of the current allocation to the total cost
+					        totalCostChromosome += allocation.getCost();
+					        totalLatencyChromosome += allocation.getLatency();
+	
+					    }
+					    
+					 // Add the total cost of the current chromosome to the total population cost
+		                totalCostPopulation += totalCostChromosome;
+		                totalLatencyPopulation += totalLatencyChromosome; 
 				
-			}
+			
+				    }
+				    // For latency and cost graphs
+//				    System.out.println("Total Cost for Population " + (i) + ": $" + String.format("%.2f", totalCostPopulation));
+//				    System.out.println("Total Latency for Population " + (i) + String.format("%.2f", totalLatencyPopulation));
+				    System.out.println(i + " " + String.format("%.2f", totalCostPopulation));
+				    System.out.println(i + " " + String.format("%.2f", totalLatencyPopulation));
+				}
+				 	
+		// TODO: Get final population cost - current issues with calculating final generation costs. Can get total population fitness at the end, but struggle to get the cost.
 			
 			
-//			population1.getChromosomes().get(1).getAllocations();
 			
+//			
+//			for (int i=0; i< population1.getPopulationSize(); i++) {
+//				
+////				population1.getChromosomes(	).get(i).printAllAllocations();		
+//			}
 			
 ////
 //	        // Test tournament selection
