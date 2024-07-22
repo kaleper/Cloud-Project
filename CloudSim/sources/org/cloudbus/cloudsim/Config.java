@@ -2,7 +2,7 @@ package org.cloudbus.cloudsim;
 
 public class Config{
 	
-	//For GA
+	// For Genetic Algorithm
 	
 		public static int numberOfGenerations = 50;
 		public static int populationSize = 50;
@@ -11,7 +11,7 @@ public class Config{
 		public static int numberOfVms = 5;
 	
 		// 4% chance of mutating an offspring - can change value if i want.
-		public static double mutationChance = 0.30;
+		public static double mutationChance = 0.04;
 		
 	
 	

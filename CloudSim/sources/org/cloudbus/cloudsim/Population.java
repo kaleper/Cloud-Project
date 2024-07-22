@@ -30,6 +30,7 @@ public class Population {
 	private static double mutationChance = Config.mutationChance;
 
 
+	// Constructor for population with indicated size 
 	public Population(int populationSize) {
 		
 	    this.populationSize = populationSize;
@@ -77,11 +78,9 @@ public class Population {
 	        Collections.shuffle(vmlist);
 	        
 	        
-	        
 	        //Allocate chromosomes randomly.
         	chromosome.allocateVmsRandomly(numberOfAllocationsPerChromosome, datacenters, vmlist);
         	
-//        	System.out.println("Total cost of chromosomes:" + chromosome.getTotalCost());
         	
         	// Calculate fitness for the chromosome
             double chromosomeFitness = chromosome.calculateChromosomeFitness(minCost, maxCost, minLatency, maxLatency);
@@ -108,12 +107,6 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		    
 		    // Create a Datacenter using the random model
 		    Datacenter datacenter = createDatacenter("Datacenter-" + i, randomModel);
-//		    System.out.println("--------");
-//		    System.out.println("--------");
-//		    System.out.println("DATACENTER ID:");
-//		    System.out.println(datacenter.getId());
-//		    System.out.println("--------");
-//		    System.out.println("--------");
 		    
 		    // Add the datacenter to the list
 		    datacenters.add(datacenter);
@@ -136,17 +129,7 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
                     vmModel.getBw(), vmModel.getSize(),
                     vmModel.getVmm(), new CloudletSchedulerTimeShared());
 		    
-		    /** Test 0utput to be deleted later **/
-//		    System.out.println("VM ID: " + vm.getId());
-//		    System.out.println("VM Model ID: " + vm.getVmModelId());
-//            System.out.println("MIPS: " + vm.getMips());
-//            System.out.println("RAM: " + vm.getRam());
-//            System.out.println("Storage Size: " + vm.getSize());
-//            System.out.println("Bandwidth: " + vm.getBw());
-//            System.out.println("Number of CPUs: " + vm.getNumberOfPes());
-//            System.out.println("VMM: " + vm.getVmm());
-//            System.out.println();
-		    
+
 			// Add each VM to the VMlist
 			vmlist.add(vm);
 		}
@@ -237,52 +220,47 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		return populationFitness;
 	}
 	
-//	// Verified works but need to debug why it won't print after generations?
-//	public double calculatePopulationCost() {
-//	    double totalCost = 0;
-//
-//	    
-//        for (Chromosome chromosome : chromosomes) {
-//            totalCost += chromosome.getTotalCost();
-//           
-//        }
-//	     
-//	   
-//	    return totalCost;
-//    }
+
+	public double calculatePopulationCost() {
+	    double totalCost = 0;
+
+        for (Chromosome chromosome : chromosomes) {
+            totalCost += chromosome.getTotalCost();
+           
+        }
+	     
+	    return totalCost;
+    }
 	
 
-//	// Verified works but need to debug why it won't print after generations?
-//	public double calculatePopulationLatency(List<Datacenter> datacenters, List<Vm> vmlist) {
-//	    double totalLatency = 0;
-//
-//        for (Chromosome chromosome : this.chromosomes) {
-//        	
-//        	for (int i = 0; i <chromosome.getAllocations().size(); i++) {
-//        		Datacenter datacenter = datacenters.get(chromosome.getAllocation(i).getDatacenterId());
-//        		Vm vm = vmlist.get(chromosome.getAllocation(i).getVmId());
-//        		
-////        		double vmCost = chromosome.getCostOfSingleVM(datacenter, vm);
-//        		double vmLatency = chromosome.calculateLatencyCost(datacenter, vm);
-//        		 totalLatency += chromosome.getTotalLatency();
-//        		 System.out.println(totalLatency);
-//        	}
-//           
-//        }
-//	     
-//	    
-//	    return totalLatency;
-//    }
-//	
+
+	public double calculatePopulationLatency(List<Datacenter> datacenters, List<Vm> vmlist) {
+	    double totalLatency = 0;
+
+        for (Chromosome chromosome : this.chromosomes) {
+        	
+        	for (int i = 0; i <chromosome.getAllocations().size(); i++) {
+        		Datacenter datacenter = datacenters.get(chromosome.getAllocation(i).getDatacenterId());
+        		Vm vm = vmlist.get(chromosome.getAllocation(i).getVmId());
+ 
+ 
+        		 totalLatency += chromosome.calculateLatencyCost(datacenter, vm);
+        	
+        	}
+           
+        }
+	    
+	    return totalLatency;
+    }
 	
 	public void doGeneration(Population population, List<Datacenter> datacenters, List<Vm> vmlist) {
 	   
-
 			// Holds new generation
 		    List<Chromosome> newGeneration = new ArrayList<>();
 		    
 		    // Generate new offspring for new gen until it has the same population size
 		    while (newGeneration.size() < populationSize) {
+		    	
 		        // Select fit parents
 		        Chromosome mother = tournamentSelection();
 		        Chromosome father = tournamentSelection();
@@ -304,8 +282,6 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		    // Update the population with the new generation
 		    population.setChromosomes(newGeneration);
 		    
-		
-
 	}
 	
 	// Selecting parents part of MOGA
@@ -382,13 +358,13 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 			
 			 
 			 // Output to show the mutation:
-//			 		System.out.println("---------");
-//					System.out.println("Old Allocation:");
-//			        System.out.println("Allocation ID: " + oldAllocation.getAllocationId());
-//			        System.out.println("VM ID: " + oldAllocation.getVmId());
-//			        System.out.println("Data Center ID: " + oldAllocation.getDatacenterId());
-//			        System.out.println("Cost: $" + String.format("%.2f", oldAllocation.getCost()));
-//			        System.out.println("Latency: " + String.format("%.2f", oldAllocation.getLatency()) + " ms");
+//		 		System.out.println("---------");
+//				System.out.println("Old Allocation:");
+//		        System.out.println("Allocation ID: " + oldAllocation.getAllocationId());
+//		        System.out.println("VM ID: " + oldAllocation.getVmId());
+//		        System.out.println("Data Center ID: " + oldAllocation.getDatacenterId());
+//		        System.out.println("Cost: $" + String.format("%.2f", oldAllocation.getCost()));
+//		        System.out.println("Latency: " + String.format("%.2f", oldAllocation.getLatency()) + " ms");
 			        
 			 
 	        // Get a new random datacenter ID different from the current one
@@ -400,6 +376,7 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		 	
 		 	
 		 	int currentVmID = oldAllocation.getVmId();
+		 	
 		 	Vm currentVM = vmlist.get(currentVmID);
 		 	
 		 	Datacenter newDataCenter = datacenters.get(randomDatacenterID);
@@ -445,7 +422,7 @@ public static void setHostsFromModels(int numberOfDataCenters, List<DatacenterMo
 		this.chromosomes = chromosomes;
 	
 	}
-	
+
 	
 	public int getPopulationSize() {
 		return populationSize;
